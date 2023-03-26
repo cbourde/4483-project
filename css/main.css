@@ -1,0 +1,32 @@
+body{
+    background: black;
+    
+}
+
+#canvas1 {
+    background: blue;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 5px solid white;
+}
+
+#playerImg, #backgroundImg, #enemyImg, #midgroundImg, #enemyDeadImg, #attkBtn, #pTurnImg, #eTurnImg, #winImg, #fight {
+    display: none;
+}
+
+#pHealth {
+    font: '40px Helvetica';
+    color: red;
+    position: relative;
+    width: 2000;
+    height: 50;
+}
+#eHealth {
+    font: '40px Helvetica';
+    color: red;
+    position: relative;
+    width: 775;
+    height: 50;
+}

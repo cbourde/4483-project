@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>FARMED AND DANGEROUS</title>
+        <meta name="view" content="width=devic-width, initial-scale=1.0">
+        <title>Farmed and Dangereous</title>
+        <link rel="stylesheet" href="css/hub.css">
+    </head>
+    <body>
+        <canvas id="canvas1"></canvas>
+        <img src="img/MAIN_PAGE.jpg" id="farmImg" alt="Farm" usemap="#farm" width="1200" height="829">
+        <map name="farm">
+            <area shape="rect" coords="900, 500, 750, 350" onclick="location.href = 'armoury.html';">
+            <area shape="rect" coords="550, 500, 700, 650" onclick="location.href = 'grain.html';">
+            <area shape="rect" coords="250, 450, 500, 350" onclick="location.href = 'stable.html';">
+            <area shape="rect" coords="500, 200, 700, 300" onclick="location.href = 'scroll.html';">
+            <area shape="rect" coords="600, 300, 700, 400" onclick="location.href = 'pigPen.html';">
+            <area shape="rect" coords="1000, 250, 1200, 550" onclick="location.href = 'workshop.html';">
+        </map>
+        <p id="pFight">Fight!</p>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $("fightSquare").hover(function(){
+            $("#pFight").show();
+          });
+        });
+    </script>
+</html>

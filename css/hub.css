@@ -1,0 +1,10 @@
+#farmImg, #grainImg, #stableImg {
+    width: 100%;
+    object-position: center top;
+    
+}
+
+
+#pFight {
+    display: none;
+}
