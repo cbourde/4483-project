@@ -59,7 +59,7 @@ function clearStorage(){
 		window.localStorage.setItem("maxHealth", "100");
 		window.localStorage.setItem("healthLevel", "0");
 		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "10");
+		window.localStorage.setItem("meleeAttack", "5");
 		window.localStorage.setItem("meleeLevel", "0");
 		window.localStorage.setItem("defense", "10");
 		window.localStorage.setItem("defenseLevel", "0");
@@ -173,7 +173,7 @@ function upgradeDefense(){
 }
 
 // Text formatting functions
-function formatHealth(base){
+function formatDefense(base){
 	let defenseLevel = parseInt(window.localStorage.getItem("defenseLevel"));
 	let defenseStats = defenseUpgradeTable[defenseLevel];
 	return `${base} +${defenseStats.amount} - ${defenseStats.price} G`;
@@ -194,14 +194,14 @@ function upgradeMelee(){
 		meleeAttack += upgrade.amount;
 		window.localStorage.setItem("meleeAttack", meleeAttack);
 
-		console.log(`Melee attack upgraded from ${oldMeleeAttack} to ${meleeAttack}`);
+		console.log(`Strength upgraded from ${oldMeleeAttack} to ${meleeAttack}`);
 
 		meleeLevel += 1;
 		window.localStorage.setItem("meleeLevel", meleeLevel);
 
 		let next = meleeUpgradeTable[meleeLevel]
 		if (next.price == Infinity){
-			this.text = "Upgrade Melee - Max level";
+			this.text = "Upgrade Strength - Max level";
 		}
 		else{
 			this.text = `${this.textBase} +${next.amount} - ${next.price} G`;
@@ -210,7 +210,7 @@ function upgradeMelee(){
 }
 
 // Text formatting functions
-function formatSpeed(base){
+function formatMelee(base){
 	let meleeLevel = parseInt(window.localStorage.getItem("meleeLevel"));
 	let meleeStats = meleeUpgradeTable[meleeLevel];
 	return `${base} +${meleeStats.amount} - ${meleeStats.price} G`;
@@ -431,8 +431,8 @@ window.addEventListener('load', function(){
 
 	// Buttons
 
-	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Melee`, 2, formatSpeed, upgradeMelee));
-	buttons.push(new ClickableButton(400, 200, 600, 60, "Upgrade Defense", 2, formatHealth, upgradeDefense));
+	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Strength`, 2, formatMelee, upgradeMelee));
+	buttons.push(new ClickableButton(400, 200, 600, 60, "Upgrade Defense", 2, formatDefense, upgradeDefense));
 	
 	
 	requestAnimationFrame(reDraw);

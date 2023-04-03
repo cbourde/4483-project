@@ -59,7 +59,7 @@ function clearStorage(){
 		window.localStorage.setItem("maxHealth", "100");
 		window.localStorage.setItem("healthLevel", "0");
 		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "10");
+		window.localStorage.setItem("meleeAttack", "5");
 		window.localStorage.setItem("meleeLevel", "0");
 		window.localStorage.setItem("defense", "10");
 		window.localStorage.setItem("defenseLevel", "0");
@@ -185,7 +185,7 @@ function formatHealth(base){
 	return `${base} +${healthStats.amount} - ${healthStats.price} G`;
 }
 
-// Upgrade speed
+// Upgrade speed/dexterity
 function upgradeSpeed(){
 	let speedLevel = parseInt(window.localStorage.getItem("speedLevel"));
 	let upgrade = speedUpgradeTable[speedLevel];
@@ -200,14 +200,14 @@ function upgradeSpeed(){
 		speed += upgrade.amount;
 		window.localStorage.setItem("speed", speed);
 
-		console.log(`Speed upgraded from ${oldSpeed} to ${speed}`);
+		console.log(`Dexterity upgraded from ${oldSpeed} to ${speed}`);
 
 		speedLevel += 1;
 		window.localStorage.setItem("speedLevel", speedLevel);
 
 		let next = speedUpgradeTable[speedLevel]
 		if (next.price == Infinity){
-			this.text = "Upgrade Speed - Max level";
+			this.text = "Upgrade Dexterity - Max level";
 		}
 		else{
 			this.text = `${this.textBase} +${next.amount} - ${next.price} G`;
@@ -217,7 +217,7 @@ function upgradeSpeed(){
 
 // Text formatting functions
 function formatSpeed(base){
-	let speedLevel = parseInt(window.localStorage.getItem("meleeLevel"));
+	let speedLevel = parseInt(window.localStorage.getItem("speedLevel"));
 	let speedStats = speedUpgradeTable[speedLevel];
 	return `${base} +${speedStats.amount} - ${speedStats.price} G`;
 }
@@ -437,7 +437,7 @@ window.addEventListener('load', function(){
 
 	// Buttons
 
-	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Speed`, 2, formatSpeed, upgradeSpeed));
+	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Dexterity`, 2, formatSpeed, upgradeSpeed));
 	buttons.push(new ClickableButton(400, 200, 600, 60, "Upgrade Health", 2, formatHealth, upgradeHealth));
 	
 	

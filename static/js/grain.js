@@ -46,7 +46,7 @@ function clearStorage(){
 		window.localStorage.setItem("maxHealth", "100");
 		window.localStorage.setItem("healthLevel", "0");
 		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "10");
+		window.localStorage.setItem("meleeAttack", "5");
 		window.localStorage.setItem("meleeLevel", "0");
 		window.localStorage.setItem("defense", "10");
 		window.localStorage.setItem("defenseLevel", "0");
