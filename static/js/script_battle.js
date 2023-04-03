@@ -14,6 +14,13 @@ const PLAYER_SINGLE_H = 200;
 const PLAYER_POSX = 200;
 const PLAYER_SPEED = 4;
 const ENEMY_Y = 290;
+const TURN_FROMTOP = 100;
+
+// RESULT BOX
+const RESULTBOX_Y_W = 1009;
+const RESULTBOXW = CANVAS_W/2 - RESULTBOX_Y_W/2; 
+const RESULTBOXH = 0;
+const RESULTBOX_Y_H = 75;
 
 // BATTLE CONSTS
 // PLAYER
@@ -21,6 +28,7 @@ const PLAYER_HEALTH = 200;
 const PLAYER_STRENGTH = 4;
 const PLAYER_DEFENCE = 10;
 const PLAYER_FSPEED = 3;
+const PLAYER_DEX = 3;
 // ENEMY
 const ENEMY_HEALTH = 150;
 const ENEMY_STRENGTH = 3;
@@ -35,11 +43,18 @@ window.addEventListener('load', function(){
     canvas.height = CANVAS_H;
     let enemies = [];
     let fight = false;
+    var critChecker = false;
+    var dodgeChecker = false;
+    var missChecker = false;
     //let fightOver = false;
+    const stabBtn = document.getElementById("stabBtn");
+    const enemyBtn = document.getElementById("enemyBtn");
     const attackBtn = document.getElementById("attkBtn");
+    const roundLabel = document.getElementById("roundStats");
     attkBtn.style.display = 'none';
     attackBtn.innerHTML = '<img src="img/icon_attack.png" />';
-    
+    stabBtn.innerHTML = '<img src="img/icon_attack2.png" />';
+    enemyBtn.innerHTML = '<img src="img/icon_enemy.png" />';
     
     // Apply Event Listeners to keyboard events and stores active keys
     class InputHandler {
@@ -69,13 +84,13 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 200;
-            this.height = 250;
+            this.width = 250;
+            this.height = 200;
             
             // Where main player is drawn on screen
             this.x = 0;
             this.y = this.gameHeight - this.height;
-            this.image = document.getElementById('playerImg');
+            this.image = document.getElementById('swing');
             this.speed = PLAYER_SPEED;
             
             //Optional parameters for drawImage() to cut out spreadsheet image. Change to move cut out, and add to drawImage.
@@ -92,34 +107,71 @@ window.addEventListener('load', function(){
             this.strength = PLAYER_STRENGTH;
             this.defence = PLAYER_DEFENCE;
             this.fightSpeed = PLAYER_FSPEED;
+            this.dex = PLAYER_DEX;
             
             
         }
-        
+        hideImage() {
+            document.getElementById("swing").style.display = 'none';
+            document.getElementById("pig_swing").style.display = 'none';
+        }
         attack() {
-            
+            // Determine players max possible damage output
             var damageDealt = this.strength * 10;
             let plusOrMinus = Math.random();
-            if (plusOrMinus => 0.5) {
+            if (plusOrMinus >= 0.5) {
                 damageDealt = damageDealt * 1.1;
-            } else {
+            } else if (plusOrMinus < 0.5 && plusOrMinus > 0.3) {
                 damageDealt = damageDealt * 0.9;
+            } else if (plusOrMinus <= 0.1) {
+                damageDealt = damageDealt * 2;
+                critChecker = true;
+            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.3) {
+                damageDealt = 0;
+                missChecker = true;
             }
             return damageDealt;
         
         }
+        
+        stab_attack() {
+            // Determine players max possible damage output
+            var damageDealt = this.dex * 10;
+            let plusOrMinus = Math.random();
+            if (plusOrMinus >= 0.5) {
+                damageDealt = damageDealt * 1.1;
+            } else if (plusOrMinus < 0.5 && plusOrMinus > 0.1) {
+                damageDealt = damageDealt * 0.9;
+            } else if (plusOrMinus <= 0.1) {
+                damageDealt = damageDealt * 2;
+                critChecker = true;
+            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.2) {
+                damageDealt = 0;
+                missChecker = true;
+            }
+            return damageDealt;
+            
+        }
         hit(power) {
+            // add dodge
             var def = this.defence / 10;
             var damageDone = power - def;
-            this.health = this.health - damageDone;
+            let dodgeChance = Math.random();
+            if(dodgeChance >= 0.8) {
+                this.health = this.health;
+                dodgeChecker = true;
+            } else {
+                this.health = this.health - damageDone;
+            }
+            
             if(this.health <= 0) {
                 this.health = 0;
             }
         }
         
         draw(context) {
- 
-            context.drawImage(this.image, this.animStart, 0, this.width, this.height, PLAYER_POSX, this.y + 58, this.width, this.height);
+            this.image = document.getElementById("swing");
+            context.drawImage(this.image, this.animStart, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
         }
         
         update(input, enemies) {
@@ -136,6 +188,48 @@ window.addEventListener('load', function(){
             });
             
             // increment walk cycle
+            if(this.currCycleNum >= this.numCycleAnim) {
+                this.currCycleNum = 0;
+            }
+            
+            const xStart = [0, 250, 500, 750];
+            this.animStart = xStart[this.currCycleNum];
+            
+            //horizontal moves
+            //THis will move character around screen: this.x += this.speed;
+            if(input.keys.indexOf('ArrowRight') > -1) {
+                this.speed = PLAYER_SPEED;
+                this.currCycleNum += 1;
+                
+            } else if(input.keys.indexOf('ArrowLeft') > -1) {
+                this.speed = -PLAYER_SPEED;
+            } else {
+                this.speed = 0;
+            }
+            if(this.x <0) {
+                this.x = 0;
+            }  else if (this.x > this.gameWidth - this.width) {
+                this.x = this.gameWidth - this.width;
+            }
+            
+        }
+        
+        drawSwing(context) {
+            this.image = document.getElementById("pig_swing");
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+        }
+        drawStab(context) {
+            this.image = document.getElementById("pig_stab");
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+        }
+        drawDodge(context) {
+            this.image = document.getElementById("pig_dodge");
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+        }
+        
+        swing() {
+            this.image = document.getElementById('swing');
+            // increment swing cycle
             if(this.currCycleNum >= this.numCycleAnim) {
                 this.currCycleNum = 0;
             }
@@ -185,25 +279,13 @@ window.addEventListener('load', function(){
             context.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
         }
         
-        update() {
-            this.x -= player.speed;
-            if(player.speed < 0) {
-                this.x=this.x;
-                //this.speed=0;
-            }
-            if(this.x < 0 - this.width) {
-                this.x = 0;
-            } else if(this.x > 0) {
-                this.x=0;
-            }
-        }
     }
     
     class playerText {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.font = '35px Helvetica';
+            this.font = '35px Luminari';
             this.fillStyle = 'red';
         }
     }
@@ -226,19 +308,6 @@ window.addEventListener('load', function(){
         draw(context) {
             context.drawImage(this.image, this.x, this.y, this.width, this.height);
             context.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
-        }
-        
-        update() {
-            this.x -= player.speed *2;
-            if(player.speed < 0) {
-                this.x=this.x;
-                //this.speed=0;
-            }
-            if(this.x < 0 - this.width) {
-                this.x = 0;
-            } else if(this.x > 0) {
-                this.x=0;
-            }
         }
     }
     
@@ -270,7 +339,7 @@ window.addEventListener('load', function(){
         }
         
         draw(context) {
-            context.drawImage(this.image, 200, 20, this.width, this.height)
+            context.drawImage(this.image, 200, TURN_FROMTOP, this.width, this.height)
         }
         
         redraw(context) {
@@ -291,7 +360,7 @@ window.addEventListener('load', function(){
         }
         
         draw(context) {
-            context.drawImage(this.image, 200, 20, this.width, this.height)
+            context.drawImage(this.image, 750, TURN_FROMTOP, this.width, this.height)
         }
         
         redraw(context) {
@@ -311,7 +380,7 @@ window.addEventListener('load', function(){
         }
         
         draw(context) {
-            context.drawImage(this.image, 145, -80, 400, 370)
+            context.drawImage(this.image, 145, 10, 400, 370)
         }
     }
     
@@ -391,29 +460,6 @@ window.addEventListener('load', function(){
         
     }
     
-    // function for generating enemies, adding, animating, removing ACTIVE enemies
-    function handleEnemies(deltaTime) {
-        if(enemyTimer > enemyInterval + randomEnemyInterval && !fight) {
-            enemies.push(new Enemy(canvas.width, canvas.height));
-            randomEnemyInterval = Math.random() * 10000 + 500;
-            enemyTimer = 0;
-        } else {
-            enemyTimer += deltaTime;
-        } 
-        
-        // Enemy hits and checks itself to remove and redraw itself in proper position
-        if(fight) {
-            // Empty the field of enemies
-            enemies = [];
-
-    
-        enemies.forEach(enemy => {
-            enemy.draw(ctx);
-            enemy.update(deltaTime);
-        });
-    }
-        
-    }
     
     function endGame1() {
         window.location.href = "scroll.html";     
@@ -429,6 +475,7 @@ window.addEventListener('load', function(){
     const midground = new Midground(canvas.width, canvas.height);
     let playerHealthTxt = document.getElementById("pHealth");
     let enemyHealthTxt = document.getElementById("eHealth");
+    let roundText = document.getElementById("roundStats");
     let deadEnemy = new DeadEnemy(canvas.width, canvas.height);
     let win = new Win(canvas.width, canvas.height);
     let playTurn = new PTurn(canvas.width, canvas.height);
@@ -437,51 +484,187 @@ window.addEventListener('load', function(){
     
     console.log("IN FIGHT:" + fight);
     background.draw(ctx);
-    background.update();
     midground.draw(ctx);
-    midground.update();
     player.draw(ctx);
     enemyParty.reDraw(ctx); // FIGHT position
-    
-    var pHealthVar = `Health: ${player.health}`;
-    var eHealthVar = `Health: ${enemyParty.health}`;
+    ctx.fillStyle = "black";
+    ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+    var pRound = Math.round(player.health);
+    var eRound = Math.round(enemyParty.health);
+    var pHealthVar = `Health: ${pRound}`;
+    var eHealthVar = `Health: ${eRound}`;
     ctx.font = '40px Helvetica';
     ctx.fillStyle = 'red';
     ctx.fillText(pHealthVar, 20, 50);
     ctx.font = '40px Helvetica';
     ctx.fillStyle = 'red';
-    ctx.fillText(eHealthVar, 775, 50);
+    ctx.fillText(eHealthVar, 755, 50);
     attackBtn.style.display = 'block';
+    stabBtn.style.display = 'block';
+    enemyBtn.style.display = 'none';
     fightImg.draw(ctx);
 	var playerTurn = true;
     let timeout;
 	
     attackBtn.addEventListener('click', () => {
         console.log("RAN an attack button for the player");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        background.update();
         midground.draw(ctx);
-        midground.update();
-        player.draw(ctx);
         enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+		var pAttack = 0;
+		var eAttack = 0;    
+        player.drawSwing(ctx);
+        pAttack = player.attack();
+        enemyParty.hit(pAttack);
+        console.log("player attack took place");
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
         
+        //Check if crit or miss occured
+        if(critChecker) {
+            roundLabel.innerHTML = `Pig performed a Crit Swing attack, <br>hitting the enemy for ${pAttack}`;
+            critChecker = false;
+        } else if (missChecker) {
+            roundLabel.innerHTML = `Pig performed a Swing attack, <br>but missed dealing 0 damage!`;
+            missChecker = false;
+            
+        } else{
+            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack}`;
+        }
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            win.draw(ctx);
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack} SLAYING THEM.`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+    })
+    
+    stabBtn.addEventListener('click', () => {
+        console.log("RAN an attack button for the player");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+		var pAttack = 0;
+		var eAttack = 0;   
+        player.drawStab(ctx);
+        pAttack = player.stab_attack();
+        enemyParty.hit(pAttack);
+        console.log("player attack took place");
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+        //Check if crit or dodge occured
+        if(critChecker) {
+            roundLabel.innerHTML = `Pig performed a Crit Stab attack, <br>hitting the enemy for ${pAttack}`;
+            critChecker = false;
+        }else if (missChecker) {
+            roundLabel.innerHTML = `Pig performed a Stab attack, <br>but missed dealing 0 damage!`;
+            missChecker = false;
+            
+        } else{
+            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}`;
+        }
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            win.draw(ctx);
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}, SLAYING THEM.`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+        
+    })
+    
+    enemyBtn.addEventListener('click', () => {
+        console.log("RAN an attack button for the player");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;
-		if ( playerTurn ){
-            enTurn.draw(ctx);
-			pAttack = player.attack();
-			enemyParty.hit(pAttack);
-			console.log("player attack took place");
-			playerTurn =  false;
-		} else {
-            playTurn.draw(ctx);
-			eAttack = enemyParty.attack();
-			player.hit(eAttack);
-			playerTurn =  true;
-			console.log("player attack took place");
-		}
-        var pHealthVar = `Health: ${player.health}`;
-        var eHealthVar = `Health: ${enemyParty.health}`;
+        player.draw(ctx);
+        playTurn.draw(ctx);
+        eAttack = enemyParty.attack();
+        player.hit(eAttack);
+        playerTurn =  true;
+        attackBtn.style.display = 'block';
+        stabBtn.style.display = 'block';
+        enemyBtn.style.display = 'none';
+        enemyBtn.style.display = 'none';
+        console.log("player attack took place");
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+        if(dodgeChecker) {
+            roundLabel.innerHTML = `Enemy performed an attack, <br>but the Pig dodged it!`;
+            //display dodge img
+            player.drawDodge(ctx);
+            dodgeChecker = false;
+        } else {
+            roundLabel.innerHTML = `Enemy performed an attack, <br>hitting the Pig for ${eAttack}`;
+        }
         ctx.font = '40px Helvetica';
         ctx.fillStyle = 'red';
         ctx.fillText(pHealthVar, 20, 50);
@@ -492,13 +675,15 @@ window.addEventListener('load', function(){
             deadEnemy.draw(ctx);
             attackBtn.style.display = 'none';
             win.draw(ctx);
-            enTurn.redraw(ctx);
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
             timeout = setTimeout(endGame2, 20000)
         }
-    })    
+        
+    })
     
 });
