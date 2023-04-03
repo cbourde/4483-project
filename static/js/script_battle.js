@@ -288,6 +288,10 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("pig_dodge");
             context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
         }
+	drawDead(context) {
+            this.image = document.getElementById("pig_dead");
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+        }
         
         swing() {
             this.image = document.getElementById('swing');
@@ -430,6 +434,22 @@ window.addEventListener('load', function(){
         }
     }
     
+    class Lose {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 350;
+            this.height = 290;
+            this.image = document.getElementById('loseImg');
+            this.x = this.gameWidth;
+            this.y = this.gameHeight - this.height;
+        }
+        
+        draw(context) {
+            context.drawImage(this.image, 145, 10, 400, 370)
+        }
+    }
+	
     class Win {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
@@ -544,6 +564,7 @@ window.addEventListener('load', function(){
     let roundText = document.getElementById("roundStats");
     let deadEnemy = new DeadEnemy(canvas.width, canvas.height);
     let win = new Win(canvas.width, canvas.height);
+    let lose = new Lose(canvas.width, canvas.height);
     let playTurn = new PTurn(canvas.width, canvas.height);
     let enTurn = new ETurn(canvas.width, canvas.height);
     let fightImg = new Fight(canvas.width, canvas.height);
