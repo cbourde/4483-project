@@ -6,12 +6,31 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>FARMED AND DANGEROUS</title>
         <meta name="view" content="width=devic-width, initial-scale=1.0">
-        <title>Farmed and Dangereous</title>
         <link rel="stylesheet" href="css/hub.css">
     </head>
     <body>
+        <nav id="top-bar" class="flex-container">
+            <div class="nav-item flex-item current"><a href="index.html" class="nav-link">Home</a></div>
+            <div class="nav-item flex-item"><a href="scroll.html" class="nav-link">Watchtower</a></div>
+            <div class="nav-item flex-item"><a href="armoury.html" class="nav-link">Armoury</a></div>
+            <div class="nav-item flex-item"><a href="grain.html" class="nav-link">Grain Silo</a></div>
+            <div class="nav-item flex-item"><a href="pigpen.html" class="nav-link">Pig Pen</a></div>
+            <div class="nav-item flex-item"><a href="stable.html" class="nav-link">Stable</a></div>
+            <div class="nav-item flex-item"><a href="workshop.html" class="nav-link">Workshop</a></div>
+            <div class="nav-item flex-item" id="stats-dropdown">
+                Stats &#9660;
+                <div id="stats-dropdown-content">
+                    <p class="dropdown-entry" id="dropdown-entry-melee">Melee</p>
+                    <p class="dropdown-entry" id="dropdown-entry-defense">Defense</p>
+                    <p class="dropdown-entry" id="dropdown-entry-speed">Speed</p>
+                </div>
+            </div>
+            <div class="flex-item"><span class="stat-display" id="health-display">Health: </span></div>
+            <div class="flex-item"><span class="stat-display" id="money-display">Money: </span></div>
+        </nav>
         <canvas id="canvas1"></canvas>
         <img src="img/MAIN_PAGE.jpg" id="farmImg" alt="Farm" usemap="#farm" width="1200" height="829">
+        <!--
         <map name="farm">
             <area shape="rect" coords="900, 500, 750, 350" onclick="location.href = 'armoury.html';">
             <area shape="rect" coords="550, 500, 700, 650" onclick="location.href = 'grain.html';">
@@ -20,6 +39,7 @@
             <area shape="rect" coords="600, 300, 700, 400" onclick="location.href = 'pigPen.html';">
             <area shape="rect" coords="1000, 250, 1200, 550" onclick="location.href = 'workshop.html';">
         </map>
+        -->
         <p id="pFight">Fight!</p>
     </body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
@@ -30,4 +50,5 @@
           });
         });
     </script>
+    <script src="js/hub.js"></script>
 </html>
