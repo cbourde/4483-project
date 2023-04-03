@@ -81,16 +81,29 @@ body{
 }
 
 #pHealth {
-    font: '40px Helvetica';
+    font: 'Helvetica';
+    font-size: 40;
     color: red;
     position: relative;
     width: 2000;
     height: 50;
 }
 #eHealth {
-    font: '40px Helvetica';
+    font: 'Helvetica';
+    font-size: 40;
     color: red;
     position: relative;
     width: 775;
     height: 50;
+}
+
+#roundStats {
+    font: 'Helvetica';
+    font-size: 19px;
+    color: darkorange;
+    position: absolute;
+    width: 1385;
+    height: 50;
+    top: 9%;
+    left:38%;
 }
