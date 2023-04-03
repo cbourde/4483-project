@@ -44,12 +44,14 @@ function clearStorage(){
 	try{
 		// If max health is not set then storage has not been initialized
 		window.localStorage.setItem("maxHealth", "100");
+		window.localStorage.setItem("healthLevel", "0");
 		window.localStorage.setItem("currentHealth", "100");
 		window.localStorage.setItem("meleeAttack", "10");
 		window.localStorage.setItem("meleeLevel", "0");
 		window.localStorage.setItem("defense", "10");
 		window.localStorage.setItem("defenseLevel", "0");
 		window.localStorage.setItem("speed", "3");
+		window.localStorage.setItem("speedLevel", "0");
 		window.localStorage.setItem("money", "0");
 	}
 	catch(err){
