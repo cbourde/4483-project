@@ -178,7 +178,7 @@ window.addEventListener('load', function(){
                 const dx = enemy.x - this.x;
                 const dy = enemy.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if(distance < enemy.width/2 + this.width/2){
+                if(distance < enemy.width + this.width - 30){
                     window.location.href = "battle.html";
                     fight = true;
                 } 
