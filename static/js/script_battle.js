@@ -749,17 +749,28 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
-            addMoney(enemyLoot);
-            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
-            
-            //enTurn.redraw(ctx);
+	    addMoney(enemyLoot);
+	    roundLabel.innerHTML = `Enemy Dropped ${enemyLoot} G!`;
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            roundLabel.innerHTML = `ur dead lol`;
-            timeout = setTimeout(endGame2, 2000);
+	    roundLabel.innerHTML = `Mighty Pig was slain!`;
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            document.getElementById("eTurnImg").style.display = 'none';
+            document.getElementById("pTurnImg").style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
+        } else {
+            if(!dodgeChecker) {
+                player.draw(ctx);
+                dodgeChecker = false;
+            }
+            playTurn.draw(ctx);
         }
         updateStatDisplays();
         
