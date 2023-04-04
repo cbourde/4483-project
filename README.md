@@ -1,5 +1,5 @@
 # CS4483 Game Demo
-Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.
+Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.  
 Cameron Bourdeau [251080553]
 ## Running the game
 This is a web-based game, so there's no single executable file to run. The game should should be available to play at http://0042069.xyz.  
