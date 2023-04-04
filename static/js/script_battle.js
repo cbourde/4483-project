@@ -35,6 +35,9 @@ const ENEMY_STRENGTH = 3;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
+const ENEMY_LOOT_MIN = 200;
+const ENEMY_LOOT_VARIANCE = 300;
+
 const SMALL_POTION_VALUE = 50;
 const BIG_POTION_VALUE = 150;
 
@@ -613,7 +616,7 @@ window.addEventListener('load', function(){
             smallPotionButton.style.display = 'none';
             bigPotionButton.style.display = 'none';
             win.draw(ctx);
-            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            let enemyLoot = Math.round(Math.random() * ENEMY_LOOT_VARIANCE + ENEMY_LOOT_MIN);
             addMoney(enemyLoot);
             //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
@@ -622,7 +625,14 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
@@ -691,7 +701,14 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
@@ -897,14 +914,14 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
-	    addMoney(enemyLoot);
-	    roundLabel.innerHTML = `Enemy Dropped ${enemyLoot} G!`;
+	        addMoney(enemyLoot);
+	        roundLabel.innerHTML = `Enemy Dropped ${enemyLoot} G!`;
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-	    roundLabel.innerHTML = `Mighty Pig was slain!`;
+	        roundLabel.innerHTML = `Mighty Pig was slain!`;
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';

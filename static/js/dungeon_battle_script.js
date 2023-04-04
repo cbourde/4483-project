@@ -35,6 +35,11 @@ const ENEMY_STRENGTH = 3;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
+const ENEMY_LOOT_MIN = 200;
+const ENEMY_LOOT_VARIANCE = 300;
+
+const SMALL_POTION_VALUE = 50;
+const BIG_POTION_VALUE = 150;
 window.addEventListener('load', function(){
    
     const canvas = document.getElementById('canvas1');
@@ -50,11 +55,25 @@ window.addEventListener('load', function(){
     const stabBtn = document.getElementById("stabBtn");
     const enemyBtn = document.getElementById("enemyBtn");
     const attackBtn = document.getElementById("attkBtn");
+    const smallPotionButton = document.getElementById("smallPotionButton");
+    const bigPotionButton = document.getElementById("bigPotionButton");
     const roundLabel = document.getElementById("roundStats");
     attkBtn.style.display = 'none';
     attackBtn.innerHTML = '<img src="img/icon_attack.png" />';
     stabBtn.innerHTML = '<img src="img/icon_attack2.png" />';
     enemyBtn.innerHTML = '<img src="img/icon_enemy.png" />';
+
+    let stats = getStorage();
+    smallPotionButton.innerHTML = `<div><img src="img/icon_heart_small.png" /><div class="potion-number" id="small-potion">${stats.inventory.smallPotion}</div></div>`;
+    bigPotionButton.innerHTML = `<div><img src="img/icon_heart_large.png" /><div class="potion-number" id="big-potion">${stats.inventory.bigPotion}</div></div>`;
+
+    let smallPotionCounter = document.getElementById("small-potion");
+    let bigPotionCounter = document.getElementById("big-potion");
+
+    function updatePotionCounters(stats){
+        smallPotionCounter.innerText = stats.inventory.smallPotion;
+        bigPotionCounter.innerText = stats.inventory.bigPotion;
+    }
     
     // Apply Event Listeners to keyboard events and stores active keys
     class InputHandler {
@@ -91,7 +110,9 @@ window.addEventListener('load', function(){
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('swing');
-            this.speed = PLAYER_SPEED;
+            let stats = getStorage();
+            this.speed = stats.dexterity;        // Current speed
+            this.moveSpeed = stats.dexterity;    // Walking speed
             
             //Optional parameters for drawImage() to cut out spreadsheet image. Change to move cut out, and add to drawImage.
             this.frameX = 0;
@@ -103,11 +124,12 @@ window.addEventListener('load', function(){
             this.animStart = 0;
             
             // Player battle stats
-            this.health = PLAYER_HEALTH;
-            this.strength = PLAYER_STRENGTH;
-            this.defence = PLAYER_DEFENCE;
-            this.fightSpeed = PLAYER_FSPEED;
-            this.dex = PLAYER_DEX;
+            this.health = stats.currentHealth;
+            this.maxHealth = stats.maxHealth;
+            this.strength = stats.strength;
+            this.defence = stats.defense;
+            this.fightSpeed = stats.dexterity;
+            this.dex = stats.dexterity;
             
             
         }
@@ -123,10 +145,10 @@ window.addEventListener('load', function(){
                 damageDealt = damageDealt * 1.1;
             } else if (plusOrMinus < 0.5 && plusOrMinus > 0.3) {
                 damageDealt = damageDealt * 0.9;
-            } else if (plusOrMinus <= 0.1) {
+            } else if (plusOrMinus <= (0.1 + 0.02 * (this.dex - 3))) {  // Dexterity increases crit chance + decreases miss chance
                 damageDealt = damageDealt * 2;
                 critChecker = true;
-            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.3) {
+            } else if (plusOrMinus > (0.1 + 0.02 * (this.dex - 3)) && plusOrMinus <= 0.3) {
                 damageDealt = 0;
                 missChecker = true;
             }
@@ -142,10 +164,10 @@ window.addEventListener('load', function(){
                 damageDealt = damageDealt * 1.1;
             } else if (plusOrMinus < 0.5 && plusOrMinus > 0.1) {
                 damageDealt = damageDealt * 0.9;
-            } else if (plusOrMinus <= 0.1) {
+            } else if (plusOrMinus <= (0.1 + 0.02 * (this.dex - 3))) {
                 damageDealt = damageDealt * 2;
                 critChecker = true;
-            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.2) {
+            } else if (plusOrMinus > (0.1 + 0.02 * (this.dex - 3)) && plusOrMinus <= 0.2) {
                 damageDealt = 0;
                 missChecker = true;
             }
@@ -156,7 +178,7 @@ window.addEventListener('load', function(){
             // add dodge
             var def = this.defence / 10;
             var damageDone = power - def;
-            let dodgeChance = Math.random();
+            let dodgeChance = Math.random() + (0.05 * (this.dex - 3));    // Dexterity increases dodge chance
             if(dodgeChance >= 0.8) {
                 this.health = this.health;
                 dodgeChecker = true;
@@ -166,6 +188,12 @@ window.addEventListener('load', function(){
             
             if(this.health <= 0) {
                 this.health = 0;
+            }
+        }
+        heal(amt){
+            this.health += amt;
+            if (this.health > this.maxHealth){
+                this.health = this.maxHealth;
             }
         }
         
@@ -198,11 +226,11 @@ window.addEventListener('load', function(){
             //horizontal moves
             //THis will move character around screen: this.x += this.speed;
             if(input.keys.indexOf('ArrowRight') > -1) {
-                this.speed = PLAYER_SPEED;
+                this.speed = this.moveSpeed;
                 this.currCycleNum += 1;
                 
             } else if(input.keys.indexOf('ArrowLeft') > -1) {
-                this.speed = -PLAYER_SPEED;
+                this.speed = -this.moveSpeed;
             } else {
                 this.speed = 0;
             }
@@ -244,11 +272,11 @@ window.addEventListener('load', function(){
             //horizontal moves
             //THis will move character around screen: this.x += this.speed;
             if(input.keys.indexOf('ArrowRight') > -1) {
-                this.speed = PLAYER_SPEED;
+                this.speed = this.moveSpeed;
                 this.currCycleNum += 1;
                 
             } else if(input.keys.indexOf('ArrowLeft') > -1) {
-                this.speed = -PLAYER_SPEED;
+                this.speed = -this.moveSpeed;
             } else {
                 this.speed = 0;
             }
@@ -464,6 +492,10 @@ window.addEventListener('load', function(){
         window.location.href = "dungeon.html";     
     }
     function endGame2() {
+        let stats = getStorage();
+        stats.currentHealth = stats.maxHealth;
+        stats.money = Math.floor(stats.money / 2);
+        saveStats(stats);
         window.location.href = "index.html";     
     }
         
@@ -499,6 +531,8 @@ window.addEventListener('load', function(){
     ctx.fillText(eHealthVar, 755, 50);
     attackBtn.style.display = 'block';
     stabBtn.style.display = 'block';
+    smallPotionButton.style.display = 'block';
+    bigPotionButton.style.display = 'block';
     enemyBtn.style.display = 'none';
     fightImg.draw(ctx);
 	var playerTurn = true;
@@ -521,6 +555,8 @@ window.addEventListener('load', function(){
         playerTurn = false;
         attackBtn.style.display = 'none';
         stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
         enemyBtn.style.display = 'block';
         var pRound = Math.round(player.health);
         var eRound = Math.round(enemyParty.health);
@@ -551,23 +587,30 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * ENEMY_LOOT_VARIANCE + ENEMY_LOOT_MIN);
+            addMoney(enemyLoot);
             //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
-            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack} SLAYING THEM.`;
+            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack} SLAYING THEM.<br>Enemy dropped ${enemyLoot} G!`;
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             player.drawDead(ctx);
             lose.draw(ctx);
             timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
+        updateStatDisplays();
     })
     
     stabBtn.addEventListener('click', () => {
@@ -587,6 +630,8 @@ window.addEventListener('load', function(){
         playerTurn = false;
         attackBtn.style.display = 'none';
         stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
         enemyBtn.style.display = 'block';
         var pRound = Math.round(player.health);
         var eRound = Math.round(enemyParty.health);
@@ -616,24 +661,179 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            addMoney(enemyLoot);
+            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
             //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
-            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}, SLAYING THEM.`;
+            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}, SLAYING THEM.<br>Enemy dropped ${enemyLoot} G!`;
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             player.drawDead(ctx);
             lose.draw(ctx);
             timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
+        updateStatDisplays();
+    });
+
+    smallPotionButton.addEventListener('click', () => {
+        // Check for potion in inventory
+        let stats = getStorage();
+        if (stats.inventory.smallPotion <= 0){
+            this.alert("You don't have any small potions!");
+            return;
+        }
         
+        console.log("Player uses a small potion");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+
+        
+
+        // Heal
+        player.heal(SMALL_POTION_VALUE);
+        stats.currentHealth = Math.round(player.health);
+
+        // Remove potion from inventory
+        stats.inventory.smallPotion--;        
+        saveStats(stats);
+		
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+                
+        roundLabel.innerHTML = `Pig drank a small potion, healing ${SMALL_POTION_VALUE} health!`;
+        
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            addMoney(enemyLoot);
+            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Enemy died!.<br>Enemy dropped ${enemyLoot} G!`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+        updateStatDisplays();
+        updatePotionCounters(stats);
+    });
+
+    bigPotionButton.addEventListener('click', () => {
+        // Check for potion in inventory
+        let stats = getStorage();
+        if (stats.inventory.bigPotion <= 0){
+            this.alert("You don't have any big potions!");
+            return;
+        }
+        
+        console.log("Player uses a big potion");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+
+        
+
+        // Heal
+        player.heal(BIG_POTION_VALUE);
+        stats.currentHealth = Math.round(player.health);
+
+        // Remove potion from inventory
+        stats.inventory.bigPotion--;        
+        saveStats(stats);
+		
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+                
+        roundLabel.innerHTML = `Pig drank a big potion, healing ${BIG_POTION_VALUE} health!`;
+        
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            addMoney(enemyLoot);
+            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Enemy died!.<br>Enemy dropped ${enemyLoot} G!`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+        updateStatDisplays();
+        updatePotionCounters(stats);
     })
     
     enemyBtn.addEventListener('click', () => {
@@ -652,6 +852,8 @@ window.addEventListener('load', function(){
         playerTurn =  true;
         attackBtn.style.display = 'block';
         stabBtn.style.display = 'block';
+        smallPotionButton.style.display = 'block';
+        bigPotionButton.style.display = 'block';
         enemyBtn.style.display = 'none';
         enemyBtn.style.display = 'none';
         console.log("player attack took place");
@@ -659,6 +861,9 @@ window.addEventListener('load', function(){
         var eRound = Math.round(enemyParty.health);
         var pHealthVar = `Health: ${pRound}`;
         var eHealthVar = `Health: ${eRound}`;
+        let stats = getStorage();
+        stats.currentHealth = pRound;
+        saveStats(stats);
         ctx.fillStyle = "black";
         ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
         if(dodgeChecker) {
@@ -679,15 +884,20 @@ window.addEventListener('load', function(){
             deadEnemy.draw(ctx);
             attackBtn.style.display = 'none';
             win.draw(ctx);
-            //enTurn.redraw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+	        addMoney(enemyLoot);
+	        roundLabel.innerHTML = `Enemy Dropped ${enemyLoot} G!`;
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
+            roundLabel.innerHTML = `Mighty Pig was slain!`;
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             document.getElementById("eTurnImg").style.display = 'none';
             document.getElementById("pTurnImg").style.display = 'none';
             player.drawDead(ctx);
@@ -701,6 +911,7 @@ window.addEventListener('load', function(){
             playTurn.draw(ctx);
             player.draw(ctx);
         }
+        updateStatDisplays();
         
     })
     
