@@ -876,7 +876,6 @@ window.addEventListener('load', function(){
         document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;
-        player.draw(ctx);
         playTurn.draw(ctx);
         eAttack = enemyParty.attack();
         player.hit(eAttack);
