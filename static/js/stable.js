@@ -21,15 +21,6 @@ const PLAYER_HEALTH = 200;
 const PLAYER_STRENGTH = 10;
 const PLAYER_DEFENCE = 10;
 const PLAYER_FSPEED = 3;
-// ENEMY
-const ENEMY_HEALTH = 150;
-const ENEMY_STRENGTH = 6;
-const ENEMY_DEFENCE = 15;
-const ENEMY_FSPEED = 2;
-
-//Healing prices
-const FULL_HEAL_PRICE = 500;
-const HALF_HEAL_PRICE = 100;
 
 let buttons = [];
 
@@ -69,43 +60,42 @@ function handleClick(e, ctx){
 // -------------- Button functions -----------------
 // =================================================
 
-// Heal to full
-function healFull(){
-	if (checkMoney(FULL_HEAL_PRICE)){
-		let stats = JSON.parse(window.localStorage.getItem("stats"));
-		if (stats.currentHealth >= stats.maxHealth){
-			alert("You don't need to heal right now!");
-			return;
+// Upgrade Inventory
+function upgradeInventory(){
+	let stats = getStorage();
+	let upgrade = inventoryUpgradeTable[stats.inventory.level]
+	if (checkMoney(upgrade.price)){
+		stats.money -= upgrade.price;
+		stats.inventory.maxItems += upgrade.amount;
+
+		console.log(`Inventory upgraded to ${stats.inventory.maxItems}`);
+
+		stats.inventory.level += 1;
+
+		saveStats(stats);
+
+		let next = inventoryUpgradeTable[stats.inventory.level];
+		if (next.price == Infinity){
+			this.text = "Upgrade Inventory - Max level";
 		}
-		stats.money -= FULL_HEAL_PRICE;
-		stats.currentHealth = stats.maxHealth;
-		window.localStorage.setItem("stats", JSON.stringify(stats));
+		else{
+			this.text = `${this.textBase} (+${next.amount}) - ${next.price} G`;
+		}
 	}
+	buttons[0].text = formatInventoryList("");
 }
 
 // Text formatting functions
-function formatFullHeal(base){
-	return `${base} - ${FULL_HEAL_PRICE} G`;
+function formatInventory(base){
+	let stats = getStorage();
+	return `${base} - ${inventoryUpgradeTable[stats.inventory.level].price} G`;
 }
 
-// Heal to half
-function healHalf(){
-	if (checkMoney(HALF_HEAL_PRICE)){
-		let stats = JSON.parse(window.localStorage.getItem("stats"));
-		if (stats.currentHealth >= Math.ceil(stats.maxHealth / 2)){
-			alert("You don't need to heal right now!");
-			return;
-		}
-		stats.money -= HALF_HEAL_PRICE;
-		stats.currentHealth = Math.ceil(stats.maxHealth / 2);
-		window.localStorage.setItem("stats", JSON.stringify(stats));
-	}
+function formatInventoryList(base){
+	let stats = getStorage();
+	return `Small: ${stats.inventory.smallPotion} | Big: ${stats.inventory.bigPotion} | Total: ${stats.inventory.smallPotion + stats.inventory.bigPotion}/${stats.inventory.maxItems}`;
 }
 
-// Text formatting functions
-function formatHalfHeal(base){
-	return `${base} - ${HALF_HEAL_PRICE} G`;
-}
 
 window.addEventListener('load', function(){
 	
@@ -322,8 +312,8 @@ window.addEventListener('load', function(){
 
 	// Buttons
 
-	buttons.push(new ClickableButton(400, 100, 600, 60, `Heal to Full`, 2, formatFullHeal, healFull));
-	buttons.push(new ClickableButton(400, 180, 600, 60, `Heal to Half`, 2, formatHalfHeal, healHalf));
+	buttons.push(new ClickableButton(400, 100, 600, 60, ``, 2, formatInventoryList, () => {console.log("Don't click this")}));
+	buttons.push(new ClickableButton(400, 180, 600, 60, `Upgrade Inventory`, 2, formatInventory, upgradeInventory));
 	
 	
 	requestAnimationFrame(reDraw);

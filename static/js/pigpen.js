@@ -27,80 +27,7 @@ const ENEMY_STRENGTH = 6;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
-// Stats display elements
-let healthDisplay = document.getElementById("health-display");
-let moneyDisplay = document.getElementById("money-display");
-let meleeDisplay = document.getElementById("dropdown-entry-melee");
-let defenseDisplay = document.getElementById("dropdown-entry-defense");
-let speedDisplay = document.getElementById("dropdown-entry-speed");
-
 let buttons = [];
-let healthUpgradeTable = [
-	{amount: 25, price: 100},
-	{amount: 25, price: 200},
-	{amount: 50, price: 500},
-	{amount: 50, price: 1000},
-	{amount: 50, price: 1500},
-	{amount: 0, price: Infinity}
-];
-let speedUpgradeTable = [
-	{amount: 1, price: 100},
-	{amount: 1, price: 200},
-	{amount: 1, price: 500},
-	{amount: 1, price: 1000},
-	{amount: 1, price: 1500},
-	{amount: 1, price: 2500},
-	{amount: 0, price: Infinity}
-];
-
-function clearStorage(){
-	try{
-		// If max health is not set then storage has not been initialized
-		window.localStorage.setItem("maxHealth", "100");
-		window.localStorage.setItem("healthLevel", "0");
-		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "5");
-		window.localStorage.setItem("meleeLevel", "0");
-		window.localStorage.setItem("defense", "10");
-		window.localStorage.setItem("defenseLevel", "0");
-		window.localStorage.setItem("speed", "3");
-		window.localStorage.setItem("speedLevel", "0");
-		window.localStorage.setItem("money", "0");
-	}
-	catch(err){
-		// User doesn't have local storage enabled
-		alert("Local storage permission must be enabled for this game to work properly. Enable, then refresh the page.");
-		return;
-	}
-}
-
-function initStorage(){
-	if (window.localStorage.getItem("maxHealth") === null){
-		clearStorage();
-	}
-	// If max health is already set then storage has been initialized somewhere else already
-}
-
-function addMoney(amt){
-	let money = parseInt(window.localStorage.getItem("money"));
-	money += amt;
-	window.localStorage.setItem("money", money);
-}
-
-function updateStatDisplays(){
-	let health = parseInt(window.localStorage.getItem("currentHealth"));
-	let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-	let money = parseInt(window.localStorage.getItem("money"));
-	let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-	let defense = parseInt(window.localStorage.getItem("defense"));
-	let speed = parseInt(window.localStorage.getItem("speed"));
-
-	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
-	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Strength: ${meleeAttack}`;
-	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Dexterity: ${speed}`;
-}
 
 // Define a shape path without drawing it (for mouse-over detection)
 function definePath(rect, ctx){
@@ -138,39 +65,24 @@ function handleClick(e, ctx){
 // -------------- Button functions -----------------
 // =================================================
 
-// Check player's money
-function checkMoney(price){
-	let money = parseInt(window.localStorage.getItem("money"));
-	if (money < price){
-		alert("Not enough money!");
-		return false;
-	}
-	return true;
-}
-
 // Upgrade health
 function upgradeHealth(){
-	let healthLevel = parseInt(window.localStorage.getItem("healthLevel"));
-	let upgrade = healthUpgradeTable[healthLevel];
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	let upgrade = healthUpgradeTable[stats.healthLevel];
 
 	if (checkMoney(upgrade.price)){
-		let money = parseInt(window.localStorage.getItem("money"));
-		money -= upgrade.price;
-		window.localStorage.setItem("money", money);
+		stats.money -= upgrade.price;
+		stats.maxHealth += upgrade.amount;
 
-		let health = parseInt(window.localStorage.getItem("maxHealth"));
-		let oldHealth = health;
-		health += upgrade.amount;
-		window.localStorage.setItem("maxHealth", health);
+		console.log(`Max health upgraded to ${stats.maxHealth}`);
 
-		console.log(`max health upgraded from ${oldHealth} to ${health}`);
+		stats.healthLevel += 1;
 
-		healthLevel += 1;
-		window.localStorage.setItem("healthLevel", healthLevel);
+		window.localStorage.setItem("stats", JSON.stringify(stats));
 
-		let next = healthUpgradeTable[healthLevel]
+		let next = healthUpgradeTable[stats.healthLevel]
 		if (next.price == Infinity){
-			this.text = "Upgrade Max Health - Max level";
+			this.text = "Upgrade Health - Max level";
 		}
 		else{
 			this.text = `${this.textBase} +${next.amount} - ${next.price} G`;
@@ -180,32 +92,26 @@ function upgradeHealth(){
 
 // Text formatting functions
 function formatHealth(base){
-	let healthLevel = parseInt(window.localStorage.getItem("defenseLevel"));
-	let healthStats = healthUpgradeTable[healthLevel];
-	return `${base} +${healthStats.amount} - ${healthStats.price} G`;
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	return `${base} +${healthUpgradeTable[stats.healthLevel].amount} - ${healthUpgradeTable[stats.healthLevel].price} G`;
 }
 
 // Upgrade speed/dexterity
-function upgradeSpeed(){
-	let speedLevel = parseInt(window.localStorage.getItem("speedLevel"));
-	let upgrade = speedUpgradeTable[speedLevel];
+function upgradeDexterity(){
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	let upgrade = speedUpgradeTable[stats.dexLevel];
 
 	if (checkMoney(upgrade.price)){
-		let money = parseInt(window.localStorage.getItem("money"));
-		money -= upgrade.price;
-		window.localStorage.setItem("money", money);
+		stats.money -= upgrade.price;
+		stats.dexterity += upgrade.amount;
 
-		let speed = parseInt(window.localStorage.getItem("speed"));
-		let oldSpeed = speed;
-		speed += upgrade.amount;
-		window.localStorage.setItem("speed", speed);
+		console.log(`Dexterity upgraded to ${stats.dexterity}`);
 
-		console.log(`Dexterity upgraded from ${oldSpeed} to ${speed}`);
+		stats.dexLevel += 1;
 
-		speedLevel += 1;
-		window.localStorage.setItem("speedLevel", speedLevel);
+		window.localStorage.setItem("stats", JSON.stringify(stats));
 
-		let next = speedUpgradeTable[speedLevel]
+		let next = speedUpgradeTable[stats.dexLevel]
 		if (next.price == Infinity){
 			this.text = "Upgrade Dexterity - Max level";
 		}
@@ -216,10 +122,9 @@ function upgradeSpeed(){
 }
 
 // Text formatting functions
-function formatSpeed(base){
-	let speedLevel = parseInt(window.localStorage.getItem("speedLevel"));
-	let speedStats = speedUpgradeTable[speedLevel];
-	return `${base} +${speedStats.amount} - ${speedStats.price} G`;
+function formatDexterity(base){
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	return `${base} +${speedUpgradeTable[stats.dexLevel].amount} - ${speedUpgradeTable[stats.dexLevel].price} G`;
 }
 
 window.addEventListener('load', function(){
@@ -427,8 +332,6 @@ window.addEventListener('load', function(){
 	////////////////////////////////////////////////////
 	//  MAIN
 
-	initStorage();
-	updateStatDisplays();
 	canvas.addEventListener("click", buttonClicked);
 	
 	const input = new InputHandler();
@@ -437,7 +340,7 @@ window.addEventListener('load', function(){
 
 	// Buttons
 
-	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Dexterity`, 2, formatSpeed, upgradeSpeed));
+	buttons.push(new ClickableButton(400, 100, 600, 60, `Upgrade Dexterity`, 2, formatDexterity, upgradeDexterity));
 	buttons.push(new ClickableButton(400, 200, 600, 60, "Upgrade Health", 2, formatHealth, upgradeHealth));
 	
 	

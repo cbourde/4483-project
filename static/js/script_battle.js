@@ -35,65 +35,8 @@ const ENEMY_STRENGTH = 3;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
-// Stats display elements
-let healthDisplay = document.getElementById("health-display");
-let moneyDisplay = document.getElementById("money-display");
-let meleeDisplay = document.getElementById("dropdown-entry-melee");
-let defenseDisplay = document.getElementById("dropdown-entry-defense");
-let speedDisplay = document.getElementById("dropdown-entry-speed");
-
-// Storage management
-function clearStorage(){
-	try{
-		// If max health is not set then storage has not been initialized
-		window.localStorage.setItem("maxHealth", "100");
-		window.localStorage.setItem("healthLevel", "0");
-		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "5");
-		window.localStorage.setItem("meleeLevel", "0");
-		window.localStorage.setItem("defense", "10");
-		window.localStorage.setItem("defenseLevel", "0");
-		window.localStorage.setItem("speed", "3");
-		window.localStorage.setItem("speedLevel", "0");
-		window.localStorage.setItem("money", "0");
-	}
-	catch(err){
-		// User doesn't have local storage enabled
-		alert("Local storage permission must be enabled for this game to work properly. Enable, then refresh the page.");
-		return;
-	}
-}
-
-function initStorage(){
-	if (window.localStorage.getItem("maxHealth") === null){
-		clearStorage();
-	}
-	// If max health is already set then storage has been initialized somewhere else already
-}
-
-function updateStatDisplays(){
-	let health = parseInt(window.localStorage.getItem("currentHealth"));
-	let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-	let money = parseInt(window.localStorage.getItem("money"));
-	let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-	let defense = parseInt(window.localStorage.getItem("defense"));
-	let speed = parseInt(window.localStorage.getItem("speed"));
-
-	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
-	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Strength: ${meleeAttack}`;
-	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Dexterity: ${speed}`;
-}
-
-function addMoney(amt){
-	let money = parseInt(window.localStorage.getItem("money"));
-	money += amt;
-	window.localStorage.setItem("money", money);
-}
-
-initStorage();
-updateStatDisplays();
+const SMALL_POTION_VALUE = 50;
+const BIG_POTION_VALUE = 150;
 
 
 window.addEventListener('load', function(){
@@ -111,11 +54,25 @@ window.addEventListener('load', function(){
     const stabBtn = document.getElementById("stabBtn");
     const enemyBtn = document.getElementById("enemyBtn");
     const attackBtn = document.getElementById("attkBtn");
+    const smallPotionButton = document.getElementById("smallPotionButton");
+    const bigPotionButton = document.getElementById("bigPotionButton");
     const roundLabel = document.getElementById("roundStats");
     attkBtn.style.display = 'none';
     attackBtn.innerHTML = '<img src="img/icon_attack.png" />';
     stabBtn.innerHTML = '<img src="img/icon_attack2.png" />';
     enemyBtn.innerHTML = '<img src="img/icon_enemy.png" />';
+    let stats = getStorage();
+    smallPotionButton.innerHTML = `<div><img src="img/icon_heart_small.png" /><div class="potion-number" id="small-potion">${stats.inventory.smallPotion}</div></div>`;
+    bigPotionButton.innerHTML = `<div><img src="img/icon_heart_large.png" /><div class="potion-number" id="big-potion">${stats.inventory.bigPotion}</div></div>`;
+
+    let smallPotionCounter = document.getElementById("small-potion");
+    let bigPotionCounter = document.getElementById("big-potion");
+
+    function updatePotionCounters(stats){
+        smallPotionCounter.innerText = stats.inventory.smallPotion;
+        bigPotionCounter.innerText = stats.inventory.bigPotion;
+    }
+
     
     // Apply Event Listeners to keyboard events and stores active keys
     class InputHandler {
@@ -152,8 +109,9 @@ window.addEventListener('load', function(){
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('swing');
-            this.speed = parseInt(window.localStorage.getItem("speed"));        // Current speed
-            this.moveSpeed = parseInt(window.localStorage.getItem("speed"));    // Walking speed
+            let stats = getStorage();
+            this.speed = stats.dexterity;        // Current speed
+            this.moveSpeed = stats.dexterity;    // Walking speed
             
             //Optional parameters for drawImage() to cut out spreadsheet image. Change to move cut out, and add to drawImage.
             this.frameX = 0;
@@ -165,11 +123,12 @@ window.addEventListener('load', function(){
             this.animStart = 0;
             
             // Player battle stats
-            this.health = parseInt(window.localStorage.getItem("currentHealth"));
-            this.strength = parseInt(window.localStorage.getItem("meleeAttack"));
-            this.defence = parseInt(window.localStorage.getItem("defense"));
-            this.fightSpeed = parseInt(window.localStorage.getItem("speed"));
-            this.dex = parseInt(window.localStorage.getItem("speed"));
+            this.health = stats.currentHealth;
+            this.maxHealth = stats.maxHealth;
+            this.strength = stats.strength;
+            this.defence = stats.defense;
+            this.fightSpeed = stats.dexterity;
+            this.dex = stats.dexterity;
             
             
         }
@@ -228,6 +187,12 @@ window.addEventListener('load', function(){
             
             if(this.health <= 0) {
                 this.health = 0;
+            }
+        }
+        heal(amt){
+            this.health += amt;
+            if (this.health > this.maxHealth){
+                this.health = this.maxHealth;
             }
         }
         
@@ -547,10 +512,10 @@ window.addEventListener('load', function(){
         window.location.href = "scroll.html";     
     }
     function endGame2() {
-        let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-        let money = parseInt(window.localStorage.getItem("money"));
-        window.localStorage.setItem("currentHealth", maxHealth);
-        window.localStorage.setItem("money", Math.floor(money / 2));
+        let stats = getStorage();
+        stats.currentHealth = stats.maxHealth;
+        stats.money = Math.floor(stats.money / 2);
+        saveStats(stats);
         window.location.href = "index.html";     
     }
         
@@ -588,6 +553,8 @@ window.addEventListener('load', function(){
     ctx.fillText(eHealthVar, 755, 50);
     attackBtn.style.display = 'block';
     stabBtn.style.display = 'block';
+    smallPotionButton.style.display = 'block';
+    bigPotionButton.style.display = 'block';
     enemyBtn.style.display = 'none';
     fightImg.draw(ctx);
 	var playerTurn = true;
@@ -611,6 +578,8 @@ window.addEventListener('load', function(){
         playerTurn = false;
         attackBtn.style.display = 'none';
         stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
         enemyBtn.style.display = 'block';
         var pRound = Math.round(player.health);
         var eRound = Math.round(enemyParty.health);
@@ -641,6 +610,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -676,6 +647,8 @@ window.addEventListener('load', function(){
         playerTurn = false;
         attackBtn.style.display = 'none';
         stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
         enemyBtn.style.display = 'block';
         var pRound = Math.round(player.health);
         var eRound = Math.round(enemyParty.health);
@@ -705,6 +678,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -721,6 +696,154 @@ window.addEventListener('load', function(){
             enTurn.draw(ctx);
         }
         updateStatDisplays();
+    });
+
+    smallPotionButton.addEventListener('click', () => {
+        // Check for potion in inventory
+        let stats = getStorage();
+        if (stats.inventory.smallPotion <= 0){
+            this.alert("You don't have any small potions!");
+            return;
+        }
+        
+        console.log("Player uses a small potion");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+
+        
+
+        // Heal
+        player.heal(SMALL_POTION_VALUE);
+        stats.currentHealth = Math.round(player.health);
+
+        // Remove potion from inventory
+        stats.inventory.smallPotion--;        
+        saveStats(stats);
+		
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+                
+        roundLabel.innerHTML = `Pig drank a small potion, healing ${SMALL_POTION_VALUE} health!`;
+        
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            addMoney(enemyLoot);
+            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Enemy died!.<br>Enemy dropped ${enemyLoot} G!`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+        updateStatDisplays();
+        updatePotionCounters(stats);
+    });
+
+    bigPotionButton.addEventListener('click', () => {
+        // Check for potion in inventory
+        let stats = getStorage();
+        if (stats.inventory.bigPotion <= 0){
+            this.alert("You don't have any big potions!");
+            return;
+        }
+        
+        console.log("Player uses a big potion");
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx);
+        midground.draw(ctx);
+        enemyParty.reDraw(ctx);
+        document.getElementById("swing").style.display = 'none';
+        document.getElementById("pig_swing").style.display = 'none';
+        document.getElementById("pig_stab").style.display = 'none';
+
+        
+
+        // Heal
+        player.heal(BIG_POTION_VALUE);
+        stats.currentHealth = Math.round(player.health);
+
+        // Remove potion from inventory
+        stats.inventory.bigPotion--;        
+        saveStats(stats);
+		
+        playerTurn = false;
+        attackBtn.style.display = 'none';
+        stabBtn.style.display = 'none';
+        smallPotionButton.style.display = 'none';
+        bigPotionButton.style.display = 'none';
+        enemyBtn.style.display = 'block';
+        var pRound = Math.round(player.health);
+        var eRound = Math.round(enemyParty.health);
+        var pHealthVar = `Health: ${pRound}`;
+        var eHealthVar = `Health: ${eRound}`;
+        ctx.fillStyle = "black";
+        ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
+                
+        roundLabel.innerHTML = `Pig drank a big potion, healing ${BIG_POTION_VALUE} health!`;
+        
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(pHealthVar, 20, 50);
+        ctx.font = '40px Helvetica';
+        ctx.fillStyle = 'red';
+        ctx.fillText(eHealthVar, 775, 50);
+        if(enemyParty.health <= 0) {
+            deadEnemy.draw(ctx);
+            attackBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
+            win.draw(ctx);
+            let enemyLoot = Math.round(Math.random() * 200 + 100);
+            addMoney(enemyLoot);
+            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
+            //enTurn.redraw(ctx);
+            document.getElementById("eTurnImg").style.display = 'none';
+            playTurn.redraw(ctx);
+            roundLabel.innerHTML = `Enemy died!.<br>Enemy dropped ${enemyLoot} G!`;
+            timeout = setTimeout(endGame1, 3000);
+            
+        } else if(player.health <= 0) {
+            timeout = setTimeout(endGame2, 20000)
+        } else {
+            enTurn.draw(ctx);
+        }
+        updateStatDisplays();
+        updatePotionCounters(stats);
     })
     
     enemyBtn.addEventListener('click', () => {
@@ -741,6 +864,8 @@ window.addEventListener('load', function(){
         playerTurn =  true;
         attackBtn.style.display = 'block';
         stabBtn.style.display = 'block';
+        smallPotionButton.style.display = 'block';
+        bigPotionButton.style.display = 'block';
         enemyBtn.style.display = 'none';
         enemyBtn.style.display = 'none';
         console.log("player attack took place");
@@ -748,7 +873,9 @@ window.addEventListener('load', function(){
         var eRound = Math.round(enemyParty.health);
         var pHealthVar = `Health: ${pRound}`;
         var eHealthVar = `Health: ${eRound}`;
-        this.window.localStorage.setItem("currentHealth", pRound);
+        let stats = getStorage();
+        stats.currentHealth = pRound;
+        saveStats(stats);
         ctx.fillStyle = "black";
         ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
         if(dodgeChecker) {
@@ -781,6 +908,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             document.getElementById("eTurnImg").style.display = 'none';
             document.getElementById("pTurnImg").style.display = 'none';
             player.drawDead(ctx);

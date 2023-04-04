@@ -21,15 +21,10 @@ const PLAYER_HEALTH = 200;
 const PLAYER_STRENGTH = 10;
 const PLAYER_DEFENCE = 10;
 const PLAYER_FSPEED = 3;
-// ENEMY
-const ENEMY_HEALTH = 150;
-const ENEMY_STRENGTH = 6;
-const ENEMY_DEFENCE = 15;
-const ENEMY_FSPEED = 2;
 
 //Healing prices
-const FULL_HEAL_PRICE = 500;
-const HALF_HEAL_PRICE = 100;
+const SMALL_POTION_PRICE = 200;
+const LARGE_POTION_PRICE = 600;
 
 let buttons = [];
 
@@ -69,42 +64,42 @@ function handleClick(e, ctx){
 // -------------- Button functions -----------------
 // =================================================
 
-// Heal to full
-function healFull(){
-	if (checkMoney(FULL_HEAL_PRICE)){
+// Buy a small potion
+function buySmallPotion(){
+	if (checkMoney(SMALL_POTION_PRICE)){
 		let stats = JSON.parse(window.localStorage.getItem("stats"));
-		if (stats.currentHealth >= stats.maxHealth){
-			alert("You don't need to heal right now!");
+		if (stats.inventory.smallPotion + stats.inventory.bigPotion >= stats.inventory.maxItems){
+			alert("Your inventory is full!");
 			return;
 		}
-		stats.money -= FULL_HEAL_PRICE;
-		stats.currentHealth = stats.maxHealth;
+		stats.money -= SMALL_POTION_PRICE;
+		stats.inventory.smallPotion++;
 		window.localStorage.setItem("stats", JSON.stringify(stats));
 	}
 }
 
 // Text formatting functions
-function formatFullHeal(base){
-	return `${base} - ${FULL_HEAL_PRICE} G`;
+function formatSmallPotion(base){
+	return `${base} - ${SMALL_POTION_PRICE} G`;
 }
 
-// Heal to half
-function healHalf(){
-	if (checkMoney(HALF_HEAL_PRICE)){
+// Buy a big potion
+function buyBigPotion(){
+	if (checkMoney(LARGE_POTION_PRICE)){
 		let stats = JSON.parse(window.localStorage.getItem("stats"));
-		if (stats.currentHealth >= Math.ceil(stats.maxHealth / 2)){
-			alert("You don't need to heal right now!");
+		if (stats.inventory.smallPotion + stats.inventory.bigPotion >= stats.inventory.maxItems){
+			alert("Your inventory is full!");
 			return;
 		}
-		stats.money -= HALF_HEAL_PRICE;
-		stats.currentHealth = Math.ceil(stats.maxHealth / 2);
+		stats.money -= LARGE_POTION_PRICE;
+		stats.inventory.bigPotion++;
 		window.localStorage.setItem("stats", JSON.stringify(stats));
 	}
 }
 
 // Text formatting functions
-function formatHalfHeal(base){
-	return `${base} - ${HALF_HEAL_PRICE} G`;
+function formatBigPotion(base){
+	return `${base} - ${LARGE_POTION_PRICE} G`;
 }
 
 window.addEventListener('load', function(){
@@ -322,8 +317,8 @@ window.addEventListener('load', function(){
 
 	// Buttons
 
-	buttons.push(new ClickableButton(400, 100, 600, 60, `Heal to Full`, 2, formatFullHeal, healFull));
-	buttons.push(new ClickableButton(400, 180, 600, 60, `Heal to Half`, 2, formatHalfHeal, healHalf));
+	buttons.push(new ClickableButton(400, 100, 600, 60, `Small Healing Potion (+50)`, 2, formatSmallPotion, buySmallPotion));
+	buttons.push(new ClickableButton(400, 180, 600, 60, `Big Healing Potion (+150)`, 2, formatBigPotion, buyBigPotion));
 	
 	
 	requestAnimationFrame(reDraw);

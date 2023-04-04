@@ -29,6 +29,9 @@ body{
     text-decoration: none;
     line-height: 2em;
 }
+.dropdown-link{
+    color: white;
+}
 .stat-display{
     color: white;
     height: 100%;
@@ -36,12 +39,12 @@ body{
     margin-left: 1em;
 }
 
-#stats-dropdown{
+.dropdown{
     color: white;
     line-height: 2em;
     position: relative;
 }
-#stats-dropdown-content{
+.dropdown-content{
     display: none;
     position: absolute;
     border: 1px solid white;
@@ -51,7 +54,7 @@ body{
     line-height: 1em;
     z-index: 1000;
 }
-#stats-dropdown:hover #stats-dropdown-content{
+.dropdown:hover .dropdown-content{
     display: block;
 }
 .dropdown-entry{
@@ -106,4 +109,17 @@ body{
     height: 50;
     top: 9%;
     left:38%;
+}
+
+.potion-number{
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+    z-index: 900;
+    font-size: 2em;
+}
+
+.button-container{
+    position: relative;
+    width: 100px;
 }
