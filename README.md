@@ -1,6 +1,8 @@
 # CS4483 Game Demo
 Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.  
 Cameron Bourdeau [251080553]
+
+
 ## Running the game
 This is a web-based game, so there's no single executable file to run. The game should should be available to play at http://0042069.xyz.  
 - If the site doesn't load, make sure you're using **HTTP and not HTTPS!** I didn't want to go through the hassle of setting up a certificate for a site that would be used for like a week lol
@@ -25,7 +27,10 @@ If these instructions seem complicated for someone who just wants to play a game
 	- If you have healing potions, you can use them with the small and large heart buttons.
 	- After attacking, click the Enemy Turn button to see what the enemy does.
 	- If you kill the enemy, you get some money. If you die, you return to the main screen and lose half of your money.
+- If you want to give yourself extra money to test the upgrade shops, open the console in your browser's developer tools and enter `addMoney(x)` where x is the amount of money you want.
+- If you want to reset your progress, enter `clearStorage()` in the browser's console, or clear your cache/cookies for the site.
 ## Features
+- Two levels: Farm (easy), Dungeon (harder)
 - Upgradeable player stats - spend money to upgrade your strength, defense, dexterity, and max health
 	- Strength affects slash attack damage
 	- Dexterity affects stab attack damage, hit chance, and dodge chance
