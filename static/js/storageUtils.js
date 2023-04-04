@@ -22,7 +22,8 @@ function clearStorage(){
 			inventory: {
 				smallPotion: 0,
 				bigPotion: 0,
-				maxItems: 3
+				maxItems: 3,
+				level: 0
 			}
 		}
 		// If max health is not set then storage has not been initialized
@@ -113,3 +114,13 @@ let speedUpgradeTable = [
 	{amount: 1, price: 2500},
 	{amount: 0, price: Infinity}
 ];
+let inventoryUpgradeTable = [
+	{amount: 1, price: 500},
+	{amount: 1, price: 750},
+	{amount: 1, price: 1000},
+	{amount: 1, price: 1250},
+	{amount: 1, price: 1500},
+	{amount: 1, price: 1750},
+	{amount: 1, price: 200},
+	{amount: 0, price: Infinity}
+]

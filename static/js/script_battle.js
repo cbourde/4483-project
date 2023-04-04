@@ -610,6 +610,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -676,6 +678,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -747,6 +751,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -819,6 +825,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             win.draw(ctx);
             let enemyLoot = Math.round(Math.random() * 200 + 100);
             addMoney(enemyLoot);
@@ -900,6 +908,8 @@ window.addEventListener('load', function(){
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
+            smallPotionButton.style.display = 'none';
+            bigPotionButton.style.display = 'none';
             document.getElementById("eTurnImg").style.display = 'none';
             document.getElementById("pTurnImg").style.display = 'none';
             player.drawDead(ctx);
