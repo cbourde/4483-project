@@ -35,67 +35,6 @@ const ENEMY_STRENGTH = 3;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
-// Stats display elements
-let healthDisplay = document.getElementById("health-display");
-let moneyDisplay = document.getElementById("money-display");
-let meleeDisplay = document.getElementById("dropdown-entry-melee");
-let defenseDisplay = document.getElementById("dropdown-entry-defense");
-let speedDisplay = document.getElementById("dropdown-entry-speed");
-
-// Storage management
-function clearStorage(){
-	try{
-		// If max health is not set then storage has not been initialized
-		window.localStorage.setItem("maxHealth", "100");
-		window.localStorage.setItem("healthLevel", "0");
-		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "5");
-		window.localStorage.setItem("meleeLevel", "0");
-		window.localStorage.setItem("defense", "10");
-		window.localStorage.setItem("defenseLevel", "0");
-		window.localStorage.setItem("speed", "3");
-		window.localStorage.setItem("speedLevel", "0");
-		window.localStorage.setItem("money", "0");
-	}
-	catch(err){
-		// User doesn't have local storage enabled
-		alert("Local storage permission must be enabled for this game to work properly. Enable, then refresh the page.");
-		return;
-	}
-}
-
-function initStorage(){
-	if (window.localStorage.getItem("maxHealth") === null){
-		clearStorage();
-	}
-	// If max health is already set then storage has been initialized somewhere else already
-}
-
-function updateStatDisplays(){
-	let health = parseInt(window.localStorage.getItem("currentHealth"));
-	let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-	let money = parseInt(window.localStorage.getItem("money"));
-	let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-	let defense = parseInt(window.localStorage.getItem("defense"));
-	let speed = parseInt(window.localStorage.getItem("speed"));
-
-	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
-	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Melee Attack: ${meleeAttack}`;
-	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Speed: ${speed}`;
-}
-
-function addMoney(amt){
-	let money = parseInt(window.localStorage.getItem("money"));
-	money += amt;
-	window.localStorage.setItem("money", money);
-}
-
-initStorage();
-updateStatDisplays();
-
-
 window.addEventListener('load', function(){
    
     const canvas = document.getElementById('canvas1');
@@ -152,8 +91,7 @@ window.addEventListener('load', function(){
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('swing');
-            this.speed = parseInt(window.localStorage.getItem("speed"));        // Current speed
-            this.moveSpeed = parseInt(window.localStorage.getItem("speed"));    // Walking speed
+            this.speed = PLAYER_SPEED;
             
             //Optional parameters for drawImage() to cut out spreadsheet image. Change to move cut out, and add to drawImage.
             this.frameX = 0;
@@ -165,11 +103,11 @@ window.addEventListener('load', function(){
             this.animStart = 0;
             
             // Player battle stats
-            this.health = parseInt(window.localStorage.getItem("currentHealth"));
-            this.strength = parseInt(window.localStorage.getItem("meleeAttack"));
-            this.defence = parseInt(window.localStorage.getItem("defense"));
-            this.fightSpeed = parseInt(window.localStorage.getItem("speed"));
-            this.dex = parseInt(window.localStorage.getItem("speed"));
+            this.health = PLAYER_HEALTH;
+            this.strength = PLAYER_STRENGTH;
+            this.defence = PLAYER_DEFENCE;
+            this.fightSpeed = PLAYER_FSPEED;
+            this.dex = PLAYER_DEX;
             
             
         }
@@ -177,7 +115,7 @@ window.addEventListener('load', function(){
             document.getElementById("swing").style.display = 'none';
             document.getElementById("pig_swing").style.display = 'none';
         }
-        attack() {  // STR based attack
+        attack() {
             // Determine players max possible damage output
             var damageDealt = this.strength * 10;
             let plusOrMinus = Math.random();
@@ -185,10 +123,10 @@ window.addEventListener('load', function(){
                 damageDealt = damageDealt * 1.1;
             } else if (plusOrMinus < 0.5 && plusOrMinus > 0.3) {
                 damageDealt = damageDealt * 0.9;
-            } else if (plusOrMinus <= (0.1 + 0.02 * (this.dex - 3))) {  // Dexterity increases crit chance + decreases miss chance
+            } else if (plusOrMinus <= 0.1) {
                 damageDealt = damageDealt * 2;
                 critChecker = true;
-            } else if (plusOrMinus > (0.1 + 0.02 * (this.dex - 3)) && plusOrMinus <= 0.3) {
+            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.3) {
                 damageDealt = 0;
                 missChecker = true;
             }
@@ -196,7 +134,7 @@ window.addEventListener('load', function(){
         
         }
         
-        stab_attack() { // DEX based attack
+        stab_attack() {
             // Determine players max possible damage output
             var damageDealt = this.dex * 10;
             let plusOrMinus = Math.random();
@@ -204,10 +142,10 @@ window.addEventListener('load', function(){
                 damageDealt = damageDealt * 1.1;
             } else if (plusOrMinus < 0.5 && plusOrMinus > 0.1) {
                 damageDealt = damageDealt * 0.9;
-            } else if (plusOrMinus <= (0.1 + 0.02 * (this.dex - 3))) {
+            } else if (plusOrMinus <= 0.1) {
                 damageDealt = damageDealt * 2;
                 critChecker = true;
-            } else if (plusOrMinus > (0.1 + 0.02 * (this.dex - 3)) && plusOrMinus <= 0.2) {
+            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.2) {
                 damageDealt = 0;
                 missChecker = true;
             }
@@ -218,7 +156,7 @@ window.addEventListener('load', function(){
             // add dodge
             var def = this.defence / 10;
             var damageDone = power - def;
-            let dodgeChance = Math.random() + (0.05 * (this.dex - 3));    // Dexterity increases dodge chance
+            let dodgeChance = Math.random();
             if(dodgeChance >= 0.8) {
                 this.health = this.health;
                 dodgeChecker = true;
@@ -233,7 +171,7 @@ window.addEventListener('load', function(){
         
         draw(context) {
             this.image = document.getElementById("swing");
-            context.drawImage(this.image, this.animStart, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+            context.drawImage(this.image, this.animStart, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
         
         update(input, enemies) {
@@ -260,11 +198,11 @@ window.addEventListener('load', function(){
             //horizontal moves
             //THis will move character around screen: this.x += this.speed;
             if(input.keys.indexOf('ArrowRight') > -1) {
-                this.speed = this.moveSpeed;
+                this.speed = PLAYER_SPEED;
                 this.currCycleNum += 1;
                 
             } else if(input.keys.indexOf('ArrowLeft') > -1) {
-                this.speed = -this.moveSpeed;
+                this.speed = -PLAYER_SPEED;
             } else {
                 this.speed = 0;
             }
@@ -278,19 +216,19 @@ window.addEventListener('load', function(){
         
         drawSwing(context) {
             this.image = document.getElementById("pig_swing");
-            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
         drawStab(context) {
             this.image = document.getElementById("pig_stab");
-            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
         drawDodge(context) {
             this.image = document.getElementById("pig_dodge");
-            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
-	drawDead(context) {
+        drawDead(context) {
             this.image = document.getElementById("pig_dead");
-            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
         
         swing() {
@@ -306,11 +244,11 @@ window.addEventListener('load', function(){
             //horizontal moves
             //THis will move character around screen: this.x += this.speed;
             if(input.keys.indexOf('ArrowRight') > -1) {
-                this.speed = this.moveSpeed;
+                this.speed = PLAYER_SPEED;
                 this.currCycleNum += 1;
                 
             } else if(input.keys.indexOf('ArrowLeft') > -1) {
-                this.speed = -this.moveSpeed;
+                this.speed = -PLAYER_SPEED;
             } else {
                 this.speed = 0;
             }
@@ -331,7 +269,7 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.image = document.getElementById('backgroundImg');
+            this.image = document.getElementById('dungeonBackgroundImg');
             this.x = 0;
             this.y = 0;
             this.width = BG_IMG_W;
@@ -356,27 +294,6 @@ window.addEventListener('load', function(){
         }
     }
     
-    // Class to Handle midground
-    class Midground {
-        
-        constructor(gameWidth, gameHeight) {
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.image = document.getElementById('midgroundImg');
-            this.x = 0;
-            this.y = -40;
-            this.width = MID_IMG_W;
-            this.height = MID_IMG_H;
-            this.speed = MID_SPEED;
-        }
-        
-        // tells which canvas the background should be drawn on
-        draw(context) {
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
-            context.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
-        }
-    }
-    
     class DeadEnemy {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
@@ -389,7 +306,7 @@ window.addEventListener('load', function(){
         }
         
         draw(context) {
-            context.drawImage(this.image, 800, this.y, this.width, this.height)
+            context.drawImage(this.image, 800, this.y - 20, this.width, this.height)
         }
     }
     
@@ -434,13 +351,13 @@ window.addEventListener('load', function(){
         }
     }
     
-    class Lose {
+    class Win {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 350;
             this.height = 290;
-            this.image = document.getElementById('loseImg');
+            this.image = document.getElementById('winImg');
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
         }
@@ -449,14 +366,14 @@ window.addEventListener('load', function(){
             context.drawImage(this.image, 145, 10, 400, 370)
         }
     }
-	
-    class Win {
+    
+    class Lose {
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 350;
             this.height = 290;
-            this.image = document.getElementById('winImg');
+            this.image = document.getElementById('loseImg');
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
         }
@@ -528,12 +445,12 @@ window.addEventListener('load', function(){
         draw(context){
             //context.strokeStyle = 'white';
             //context.strokeRect(this.x, this.y, this.width, this.height);
-            context.drawImage(this.image, this.frameX *  this.width, 0, this.width, this.height, this.x, ENEMY_Y, this.width, this.height);
+            context.drawImage(this.image, this.frameX *  this.width, 0, this.width, this.height, this.x, ENEMY_Y - 20, this.width, this.height);
             
         }
-        
+        // battle position drawn
         reDraw(context) {
-            context.drawImage(this.image, 800, this.y, this.width, this.height);
+            context.drawImage(this.image, 800, this.y - 20, this.width, this.height);
         }
         
         update(deltaTime) {
@@ -544,13 +461,9 @@ window.addEventListener('load', function(){
     
     
     function endGame1() {
-        window.location.href = "scroll.html";     
+        window.location.href = "dungeon.html";     
     }
     function endGame2() {
-        let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-        let money = parseInt(window.localStorage.getItem("money"));
-        window.localStorage.setItem("currentHealth", maxHealth);
-        window.localStorage.setItem("money", Math.floor(money / 2));
         window.location.href = "index.html";     
     }
         
@@ -558,7 +471,6 @@ window.addEventListener('load', function(){
     const player = new Player(canvas.width, canvas.height);
     const enemyParty = new Enemy(canvas.width, canvas.height);
     const background = new Background(canvas.width, canvas.height);
-    const midground = new Midground(canvas.width, canvas.height);
     let playerHealthTxt = document.getElementById("pHealth");
     let enemyHealthTxt = document.getElementById("eHealth");
     let roundText = document.getElementById("roundStats");
@@ -571,7 +483,6 @@ window.addEventListener('load', function(){
     
     console.log("IN FIGHT:" + fight);
     background.draw(ctx);
-    midground.draw(ctx);
     player.draw(ctx);
     enemyParty.reDraw(ctx); // FIGHT position
     ctx.fillStyle = "black";
@@ -597,7 +508,6 @@ window.addEventListener('load', function(){
         console.log("RAN an attack button for the player");
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        midground.draw(ctx);
         enemyParty.reDraw(ctx);
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
@@ -642,27 +552,28 @@ window.addEventListener('load', function(){
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             win.draw(ctx);
-            let enemyLoot = Math.round(Math.random() * 200 + 100);
-            addMoney(enemyLoot);
             //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
-            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack} SLAYING THEM.<br>Enemy dropped ${enemyLoot} G!`;
+            roundLabel.innerHTML = `Pig performed a Swing attack, <br>hitting the enemy for ${pAttack} SLAYING THEM.`;
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
-        updateStatDisplays();
     })
     
     stabBtn.addEventListener('click', () => {
         console.log("RAN an attack button for the player");
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        midground.draw(ctx);
         enemyParty.reDraw(ctx);
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
@@ -706,35 +617,35 @@ window.addEventListener('load', function(){
             stabBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             win.draw(ctx);
-            let enemyLoot = Math.round(Math.random() * 200 + 100);
-            addMoney(enemyLoot);
-            roundLabel.innerHTML = `Enemy dropped ${enemyLoot} G!`;
             //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
-            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}, SLAYING THEM.<br>Enemy dropped ${enemyLoot} G!`;
+            roundLabel.innerHTML = `Pig performed a Stab attack, <br>hitting the enemy for ${pAttack}, SLAYING THEM.`;
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
-        updateStatDisplays();
+        
     })
     
     enemyBtn.addEventListener('click', () => {
         console.log("RAN an attack button for the player");
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        midground.draw(ctx);
         enemyParty.reDraw(ctx);
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
         document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;
-        player.draw(ctx);
         playTurn.draw(ctx);
         eAttack = enemyParty.attack();
         player.hit(eAttack);
@@ -748,7 +659,6 @@ window.addEventListener('load', function(){
         var eRound = Math.round(enemyParty.health);
         var pHealthVar = `Health: ${pRound}`;
         var eHealthVar = `Health: ${eRound}`;
-        this.window.localStorage.setItem("currentHealth", pRound);
         ctx.fillStyle = "black";
         ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
         if(dodgeChecker) {
@@ -769,15 +679,12 @@ window.addEventListener('load', function(){
             deadEnemy.draw(ctx);
             attackBtn.style.display = 'none';
             win.draw(ctx);
-            let enemyLoot = Math.round(Math.random() * 200 + 100);
-	    addMoney(enemyLoot);
-	    roundLabel.innerHTML = `Enemy Dropped ${enemyLoot} G!`;
+            //enTurn.redraw(ctx);
             document.getElementById("eTurnImg").style.display = 'none';
             playTurn.redraw(ctx);
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-	    roundLabel.innerHTML = `Mighty Pig was slain!`;
             attackBtn.style.display = 'none';
             enemyBtn.style.display = 'none';
             stabBtn.style.display = 'none';
@@ -792,8 +699,8 @@ window.addEventListener('load', function(){
                 dodgeChecker = false;
             }
             playTurn.draw(ctx);
+            player.draw(ctx);
         }
-        updateStatDisplays();
         
     })
     

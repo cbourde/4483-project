@@ -76,7 +76,7 @@ body{
     border: 5px solid white;
 }
 
-#playerImg, #backgroundImg, #enemyImg, #midgroundImg, #enemyDeadImg, #attkBtn, #pTurnImg, #eTurnImg, #winImg, #fight, #pig_swing, #pig_stab, #pig_dodge, #swing {
+#playerImg, #backgroundImg, #enemyImg, #midgroundImg, #enemyDeadImg, #attkBtn, #pTurnImg, #eTurnImg, #winImg, #fight, #dungeonBackgroundImg, #loseImg, #pig_dead, #swing, #pig_swing, #pig_stab, #pig_dodge {
     display: none;
 }
 
