@@ -177,7 +177,7 @@ window.addEventListener('load', function(){
             document.getElementById("swing").style.display = 'none';
             document.getElementById("pig_swing").style.display = 'none';
         }
-        attack() {
+        attack() {  // STR based attack
             // Determine players max possible damage output
             var damageDealt = this.strength * 10;
             let plusOrMinus = Math.random();
@@ -196,7 +196,7 @@ window.addEventListener('load', function(){
         
         }
         
-        stab_attack() {
+        stab_attack() { // DEX based attack
             // Determine players max possible damage output
             var damageDealt = this.dex * 10;
             let plusOrMinus = Math.random();
@@ -204,10 +204,10 @@ window.addEventListener('load', function(){
                 damageDealt = damageDealt * 1.1;
             } else if (plusOrMinus < 0.5 && plusOrMinus > 0.1) {
                 damageDealt = damageDealt * 0.9;
-            } else if (plusOrMinus <= 0.1) {
+            } else if (plusOrMinus <= (0.1 + 0.02 * (this.dex - 3))) {
                 damageDealt = damageDealt * 2;
                 critChecker = true;
-            } else if (plusOrMinus > 0.1 && plusOrMinus <= 0.2) {
+            } else if (plusOrMinus > (0.1 + 0.02 * (this.dex - 3)) && plusOrMinus <= 0.2) {
                 damageDealt = 0;
                 missChecker = true;
             }
