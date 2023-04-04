@@ -30,9 +30,9 @@ const PLAYER_DEFENCE = 10;
 const PLAYER_FSPEED = 3;
 const PLAYER_DEX = 3;
 // ENEMY
-const ENEMY_HEALTH = 150;
-const ENEMY_STRENGTH = 3;
-const ENEMY_DEFENCE = 15;
+const ENEMY_HEALTH = 250;
+const ENEMY_STRENGTH = 6;
+const ENEMY_DEFENCE = 20;
 const ENEMY_FSPEED = 2;
 
 const ENEMY_LOOT_MIN = 200;
