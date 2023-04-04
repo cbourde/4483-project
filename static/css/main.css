@@ -110,3 +110,16 @@ body{
     top: 9%;
     left:38%;
 }
+
+.potion-number{
+    position: absolute;
+    bottom: 5px;
+    right: 0px;
+    z-index: 900;
+    font-size: 2em;
+}
+
+.button-container{
+    position: relative;
+    width: 100px;
+}
