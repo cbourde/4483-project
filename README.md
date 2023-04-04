@@ -1,5 +1,8 @@
 # CS4483 Game Demo
 Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.  
+GitHub: https://github.com/cbourde/4483-project  
+
+## Developers
 Cameron Bourdeau [251080553]
 
 
@@ -27,6 +30,8 @@ If these instructions seem complicated for someone who just wants to play a game
 	- If you have healing potions, you can use them with the small and large heart buttons.
 	- After attacking, click the Enemy Turn button to see what the enemy does.
 	- If you kill the enemy, you get some money. If you die, you return to the main screen and lose half of your money.
+	- After (or during) a battle, you can use the navigation bar to go back to the hub or shops. If you want a harder challenge, limit yourself to only doing this during a battle.
+		- Yeah it kind of takes away from the challenge, but even if the nav bar was disabled in battle you could just use the back button anyway.
 - If you want to give yourself extra money to test the upgrade shops, open the console in your browser's developer tools and enter `addMoney(x)` where x is the amount of money you want.
 - If you want to reset your progress, enter `clearStorage()` in the browser's console, or clear your cache/cookies for the site.
 ## Features
