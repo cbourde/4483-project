@@ -7,8 +7,7 @@ Cameron Bourdeau [251080553]
 
 
 ## Running the game
-This is a web-based game, so there's no single executable file to run. The game should should be available to play at http://0042069.xyz.  
-- If the site doesn't load, make sure you're using **HTTP and not HTTPS!** I didn't want to go through the hassle of setting up a certificate for a site that would be used for like a week lol
+This is a web-based game, so there's no single executable file to run. The game should should be available to play at:  https://cbourde.github.io/4483-project
 
 If the site is down, or if you just want to host it locally, the instructions for setting up the server are as follows:
 1. Download and install Node.js (a JavaScript runtime environment) from https://nodejs.org/en. If you're on Linux you can likely also install it using your package manager.
