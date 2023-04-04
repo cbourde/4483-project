@@ -91,9 +91,9 @@ function updateStatDisplays(){
 
 	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
 	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Melee Attack: ${meleeAttack}`;
+	meleeDisplay.innerText = `Strength: ${meleeAttack}`;
 	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Speed: ${speed}`;
+	speedDisplay.innerText = `Dexterity: ${speed}`;
 }
 
 // Define a shape path without drawing it (for mouse-over detection)

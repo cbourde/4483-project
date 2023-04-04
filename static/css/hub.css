@@ -77,3 +77,10 @@ body{
 .flex-item{
     flex-basis: 10%;
 }
+
+#main{
+    width: 1200px;
+    height: 829px;
+    margin-left: auto;
+    margin-right: auto;
+}
