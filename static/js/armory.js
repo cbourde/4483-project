@@ -27,74 +27,7 @@ const ENEMY_STRENGTH = 6;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
-// Stats display elements
-let healthDisplay = document.getElementById("health-display");
-let moneyDisplay = document.getElementById("money-display");
-let meleeDisplay = document.getElementById("dropdown-entry-melee");
-let defenseDisplay = document.getElementById("dropdown-entry-defense");
-let speedDisplay = document.getElementById("dropdown-entry-speed");
-
 let buttons = [];
-let meleeUpgradeTable = [
-	{amount: 5, price: 100},
-	{amount: 5, price: 200},
-	{amount: 10, price: 500},
-	{amount: 10, price: 1000},
-	{amount: 10, price: 1500},
-	{amount: 0, price: Infinity}
-];
-let defenseUpgradeTable = [
-	{amount: 5, price: 100},
-	{amount: 5, price: 200},
-	{amount: 5, price: 500},
-	{amount: 5, price: 1000},
-	{amount: 10, price: 1500},
-	{amount: 10, price: 2500},
-	{amount: 0, price: Infinity}
-];
-
-function clearStorage(){
-	try{
-		// If max health is not set then storage has not been initialized
-		window.localStorage.setItem("maxHealth", "100");
-		window.localStorage.setItem("healthLevel", "0");
-		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "5");
-		window.localStorage.setItem("meleeLevel", "0");
-		window.localStorage.setItem("defense", "10");
-		window.localStorage.setItem("defenseLevel", "0");
-		window.localStorage.setItem("speed", "3");
-		window.localStorage.setItem("speedLevel", "0");
-		window.localStorage.setItem("money", "0");
-	}
-	catch(err){
-		// User doesn't have local storage enabled
-		alert("Local storage permission must be enabled for this game to work properly. Enable, then refresh the page.");
-		return;
-	}
-}
-
-function initStorage(){
-	if (window.localStorage.getItem("maxHealth") === null){
-		clearStorage();
-	}
-	// If max health is already set then storage has been initialized somewhere else already
-}
-
-function updateStatDisplays(){
-	let health = parseInt(window.localStorage.getItem("currentHealth"));
-	let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-	let money = parseInt(window.localStorage.getItem("money"));
-	let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-	let defense = parseInt(window.localStorage.getItem("defense"));
-	let speed = parseInt(window.localStorage.getItem("speed"));
-
-	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
-	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Strength: ${meleeAttack}`;
-	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Dexterity: ${speed}`;
-}
 
 // Define a shape path without drawing it (for mouse-over detection)
 function definePath(rect, ctx){
@@ -132,37 +65,23 @@ function handleClick(e, ctx){
 // -------------- Button functions -----------------
 // =================================================
 
-// Check player's money
-function checkMoney(price){
-	let money = parseInt(window.localStorage.getItem("money"));
-	if (money < price){
-		alert("Not enough money!");
-		return false;
-	}
-	return true;
-}
-
-// Upgrade melee attack by a given amount
+// Upgrade defense
 function upgradeDefense(){
-	let defenseLevel = parseInt(window.localStorage.getItem("defenseLevel"));
-	let upgrade = defenseUpgradeTable[defenseLevel];
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	let upgrade = defenseUpgradeTable[stats.defenseLevel];
 
 	if (checkMoney(upgrade.price)){
-		let money = parseInt(window.localStorage.getItem("money"));
-		money -= upgrade.price;
-		window.localStorage.setItem("money", money);
+		stats.money -= upgrade.price;
+		let oldDefense = stats.defense;
+		stats.defense += upgrade.amount;
 
-		let defense = parseInt(window.localStorage.getItem("defense"));
-		let oldDefense = defense;
-		defense += upgrade.amount;
-		window.localStorage.setItem("defense", defense);
+		console.log(`Defense upgraded from ${oldDefense} to ${stats.defense}`);
 
-		console.log(`Defense upgraded from ${oldDefense} to ${defense}`);
+		stats.defenseLevel += 1;
 
-		defenseLevel += 1;
-		window.localStorage.setItem("defenseLevel", defenseLevel);
+		window.localStorage.setItem("stats", JSON.stringify(stats));
 
-		let next = defenseUpgradeTable[defenseLevel]
+		let next = defenseUpgradeTable[stats.defenseLevel]
 		if (next.price == Infinity){
 			this.text = "Upgrade Defense - Max level";
 		}
@@ -174,32 +93,27 @@ function upgradeDefense(){
 
 // Text formatting functions
 function formatDefense(base){
-	let defenseLevel = parseInt(window.localStorage.getItem("defenseLevel"));
-	let defenseStats = defenseUpgradeTable[defenseLevel];
-	return `${base} +${defenseStats.amount} - ${defenseStats.price} G`;
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	return `${base} +${defenseUpgradeTable[stats.defenseLevel].amount} - ${defenseUpgradeTable[stats.defenseLevel].price} G`;
 }
 
 // Upgrade melee attack by a given amount
 function upgradeMelee(){
-	let meleeLevel = parseInt(window.localStorage.getItem("meleeLevel"));
-	let upgrade = meleeUpgradeTable[meleeLevel];
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	let upgrade = meleeUpgradeTable[stats.strengthLevel];
 
 	if (checkMoney(upgrade.price)){
-		let money = parseInt(window.localStorage.getItem("money"));
-		money -= upgrade.price;
-		window.localStorage.setItem("money", money);
+		stats.money -= upgrade.price;
+		let oldDStrength = stats.strength;
+		stats.strength += upgrade.amount;
 
-		let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-		let oldMeleeAttack = meleeAttack;
-		meleeAttack += upgrade.amount;
-		window.localStorage.setItem("meleeAttack", meleeAttack);
+		console.log(`Strength upgraded from ${oldStrength} to ${stats.strength}`);
 
-		console.log(`Strength upgraded from ${oldMeleeAttack} to ${meleeAttack}`);
+		stats.defenseLevel += 1;
 
-		meleeLevel += 1;
-		window.localStorage.setItem("meleeLevel", meleeLevel);
+		window.localStorage.setItem("stats", JSON.stringify(stats));
 
-		let next = meleeUpgradeTable[meleeLevel]
+		let next = meleeUpgradeTable[stats.strengthLevel]
 		if (next.price == Infinity){
 			this.text = "Upgrade Strength - Max level";
 		}
@@ -211,9 +125,8 @@ function upgradeMelee(){
 
 // Text formatting functions
 function formatMelee(base){
-	let meleeLevel = parseInt(window.localStorage.getItem("meleeLevel"));
-	let meleeStats = meleeUpgradeTable[meleeLevel];
-	return `${base} +${meleeStats.amount} - ${meleeStats.price} G`;
+	let stats = JSON.parse(window.localStorage.getItem("stats"));
+	return `${base} +${meleeUpgradeTable[stats.strengthLevel].amount} - ${meleeUpgradeTable[stats.strengthLevel].price} G`;
 }
 
 window.addEventListener('load', function(){

@@ -10,6 +10,25 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
+        <nav id="top-bar" class="flex-container">
+            <div class="nav-item flex-item"><a href="index.html" class="nav-link">Home</a></div>
+            <div class="nav-item flex-item"><a href="scroll.html" class="nav-link">Watchtower</a></div>
+            <div class="nav-item flex-item"><a href="armoury.html" class="nav-link">Armoury</a></div>
+            <div class="nav-item flex-item"><a href="grain.html" class="nav-link">Grain Silo</a></div>
+            <div class="nav-item flex-item"><a href="pigpen.html" class="nav-link">Pig Pen</a></div>
+            <div class="nav-item flex-item"><a href="stable.html" class="nav-link">Stable</a></div>
+            <div class="nav-item flex-item current"><a href="workshop.html" class="nav-link">Workshop</a></div>
+            <div class="nav-item flex-item" id="stats-dropdown">
+                Stats &#9660;
+                <div id="stats-dropdown-content">
+                    <p class="dropdown-entry" id="dropdown-entry-melee">Melee</p>
+                    <p class="dropdown-entry" id="dropdown-entry-defense">Defense</p>
+                    <p class="dropdown-entry" id="dropdown-entry-speed">Speed</p>
+                </div>
+            </div>
+            <div class="flex-item"><span class="stat-display" id="health-display">Health: </span></div>
+            <div class="flex-item"><span class="stat-display" id="money-display">Money: </span></div>
+        </nav>
         <canvas id="canvas1"></canvas>
         <img id="playerImg" src="img/pig_walk.png">
         <img id="backgroundImg" src="img/library.jpg" #usemap="#farm">
@@ -22,7 +41,8 @@
             <area shape="rect" coords="0, 0, 1200, 900" onclick="location.href = 'index.html';">
         </map>
         
-        <script src="js/building_script.js"></script>
+        <script src="js/storageUtils.js"></script>
+        <script src="js/workshop.js"></script>
     
     </body>
 </html>

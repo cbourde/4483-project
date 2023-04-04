@@ -35,66 +35,6 @@ const ENEMY_STRENGTH = 3;
 const ENEMY_DEFENCE = 15;
 const ENEMY_FSPEED = 2;
 
-// Stats display elements
-let healthDisplay = document.getElementById("health-display");
-let moneyDisplay = document.getElementById("money-display");
-let meleeDisplay = document.getElementById("dropdown-entry-melee");
-let defenseDisplay = document.getElementById("dropdown-entry-defense");
-let speedDisplay = document.getElementById("dropdown-entry-speed");
-
-// Storage management
-function clearStorage(){
-	try{
-		// If max health is not set then storage has not been initialized
-		window.localStorage.setItem("maxHealth", "100");
-		window.localStorage.setItem("healthLevel", "0");
-		window.localStorage.setItem("currentHealth", "100");
-		window.localStorage.setItem("meleeAttack", "5");
-		window.localStorage.setItem("meleeLevel", "0");
-		window.localStorage.setItem("defense", "10");
-		window.localStorage.setItem("defenseLevel", "0");
-		window.localStorage.setItem("speed", "3");
-		window.localStorage.setItem("speedLevel", "0");
-		window.localStorage.setItem("money", "0");
-	}
-	catch(err){
-		// User doesn't have local storage enabled
-		alert("Local storage permission must be enabled for this game to work properly. Enable, then refresh the page.");
-		return;
-	}
-}
-
-function initStorage(){
-	if (window.localStorage.getItem("maxHealth") === null){
-		clearStorage();
-	}
-	// If max health is already set then storage has been initialized somewhere else already
-}
-
-function updateStatDisplays(){
-	let health = parseInt(window.localStorage.getItem("currentHealth"));
-	let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-	let money = parseInt(window.localStorage.getItem("money"));
-	let meleeAttack = parseInt(window.localStorage.getItem("meleeAttack"));
-	let defense = parseInt(window.localStorage.getItem("defense"));
-	let speed = parseInt(window.localStorage.getItem("speed"));
-
-	healthDisplay.innerText = `Health: ${health} / ${maxHealth}`;
-	moneyDisplay.innerText = `Money: ${money}`;
-	meleeDisplay.innerText = `Strength: ${meleeAttack}`;
-	defenseDisplay.innerText = `Defense: ${defense}`;
-	speedDisplay.innerText = `Dexterity: ${speed}`;
-}
-
-function addMoney(amt){
-	let money = parseInt(window.localStorage.getItem("money"));
-	money += amt;
-	window.localStorage.setItem("money", money);
-}
-
-initStorage();
-updateStatDisplays();
-
 
 window.addEventListener('load', function(){
    
@@ -152,8 +92,9 @@ window.addEventListener('load', function(){
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('swing');
-            this.speed = parseInt(window.localStorage.getItem("speed"));        // Current speed
-            this.moveSpeed = parseInt(window.localStorage.getItem("speed"));    // Walking speed
+            let stats = getStorage();
+            this.speed = stats.dexterity;        // Current speed
+            this.moveSpeed = stats.dexterity;    // Walking speed
             
             //Optional parameters for drawImage() to cut out spreadsheet image. Change to move cut out, and add to drawImage.
             this.frameX = 0;
@@ -165,11 +106,11 @@ window.addEventListener('load', function(){
             this.animStart = 0;
             
             // Player battle stats
-            this.health = parseInt(window.localStorage.getItem("currentHealth"));
-            this.strength = parseInt(window.localStorage.getItem("meleeAttack"));
-            this.defence = parseInt(window.localStorage.getItem("defense"));
-            this.fightSpeed = parseInt(window.localStorage.getItem("speed"));
-            this.dex = parseInt(window.localStorage.getItem("speed"));
+            this.health = stats.currentHealth;
+            this.strength = stats.strength;
+            this.defence = stats.defense;
+            this.fightSpeed = stats.dexterity;
+            this.dex = stats.dexterity;
             
             
         }
@@ -547,10 +488,10 @@ window.addEventListener('load', function(){
         window.location.href = "scroll.html";     
     }
     function endGame2() {
-        let maxHealth = parseInt(window.localStorage.getItem("maxHealth"));
-        let money = parseInt(window.localStorage.getItem("money"));
-        window.localStorage.setItem("currentHealth", maxHealth);
-        window.localStorage.setItem("money", Math.floor(money / 2));
+        let stats = getStorage();
+        stats.currentHealth = stats.maxHealth;
+        stats.money = Math.floor(stats.money / 2);
+        saveStats(stats);
         window.location.href = "index.html";     
     }
         
@@ -748,7 +689,9 @@ window.addEventListener('load', function(){
         var eRound = Math.round(enemyParty.health);
         var pHealthVar = `Health: ${pRound}`;
         var eHealthVar = `Health: ${eRound}`;
-        this.window.localStorage.setItem("currentHealth", pRound);
+        let stats = getStorage();
+        stats.currentHealth = pRound;
+        saveStats(stats);
         ctx.fillStyle = "black";
         ctx.fillRect(RESULTBOXW, RESULTBOXH, RESULTBOX_Y_W, RESULTBOX_Y_H);
         if(dodgeChecker) {
