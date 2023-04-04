@@ -699,11 +699,11 @@ window.addEventListener('load', function(){
         console.log("Player uses a small potion");
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        midground.draw(ctx);
         enemyParty.reDraw(ctx);
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
         document.getElementById("pig_stab").style.display = 'none';
+        player.draw(ctx);
 
         
 
@@ -773,11 +773,11 @@ window.addEventListener('load', function(){
         console.log("Player uses a big potion");
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx);
-        midground.draw(ctx);
         enemyParty.reDraw(ctx);
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
         document.getElementById("pig_stab").style.display = 'none';
+        player.draw(ctx);
 
         
 

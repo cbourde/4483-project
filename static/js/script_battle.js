@@ -731,6 +731,7 @@ window.addEventListener('load', function(){
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
         document.getElementById("pig_stab").style.display = 'none';
+        player.draw(ctx);
 
         
 
@@ -805,6 +806,7 @@ window.addEventListener('load', function(){
         document.getElementById("swing").style.display = 'none';
         document.getElementById("pig_swing").style.display = 'none';
         document.getElementById("pig_stab").style.display = 'none';
+        player.draw(ctx);
 
         
 
