@@ -226,6 +226,10 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("pig_dodge");
             context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
         }
+        drawDead(context) {
+            this.image = document.getElementById("pig_dead");
+            context.drawImage(this.image, 0, 0, this.width, this.height, PLAYER_POSX, this.y - 20, this.width, this.height);
+        }
         
         swing() {
             this.image = document.getElementById('swing');
@@ -302,7 +306,7 @@ window.addEventListener('load', function(){
         }
         
         draw(context) {
-            context.drawImage(this.image, 800, this.y, this.width, this.height)
+            context.drawImage(this.image, 800, this.y - 20, this.width, this.height)
         }
     }
     
@@ -354,6 +358,22 @@ window.addEventListener('load', function(){
             this.width = 350;
             this.height = 290;
             this.image = document.getElementById('winImg');
+            this.x = this.gameWidth;
+            this.y = this.gameHeight - this.height;
+        }
+        
+        draw(context) {
+            context.drawImage(this.image, 145, 10, 400, 370)
+        }
+    }
+    
+    class Lose {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 350;
+            this.height = 290;
+            this.image = document.getElementById('loseImg');
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
         }
@@ -456,6 +476,7 @@ window.addEventListener('load', function(){
     let roundText = document.getElementById("roundStats");
     let deadEnemy = new DeadEnemy(canvas.width, canvas.height);
     let win = new Win(canvas.width, canvas.height);
+    let lose = new Lose(canvas.width, canvas.height);
     let playTurn = new PTurn(canvas.width, canvas.height);
     let enTurn = new ETurn(canvas.width, canvas.height);
     let fightImg = new Fight(canvas.width, canvas.height);
@@ -538,7 +559,12 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
@@ -598,7 +624,12 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
         }
@@ -615,7 +646,6 @@ window.addEventListener('load', function(){
         document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;
-        player.draw(ctx);
         playTurn.draw(ctx);
         eAttack = enemyParty.attack();
         player.hit(eAttack);
@@ -655,7 +685,21 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame1, 3000);
             
         } else if(player.health <= 0) {
-            timeout = setTimeout(endGame2, 20000)
+            attackBtn.style.display = 'none';
+            enemyBtn.style.display = 'none';
+            stabBtn.style.display = 'none';
+            document.getElementById("eTurnImg").style.display = 'none';
+            document.getElementById("pTurnImg").style.display = 'none';
+            player.drawDead(ctx);
+            lose.draw(ctx);
+            timeout = setTimeout(endGame2, 5000);
+        } else {
+            if(!dodgeChecker) {
+                player.draw(ctx);
+                dodgeChecker = false;
+            }
+            playTurn.draw(ctx);
+            player.draw(ctx);
         }
         
     })
