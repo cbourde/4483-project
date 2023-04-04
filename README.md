@@ -17,10 +17,11 @@ If these instructions seem complicated for someone who just wants to play a game
 	- Go to the Watchtower to fight enemies and earn money.
 	- Go to the Armory and the Pig Pen to spend money to upgrade your abilities.
 	- Go to the Grain Silo to heal after a fight.
-	- [NYI] Go to the Workshop to purchase items to use in battle.
-	- [NYI] Go to the Stable to check your inventory.
+	- Go to the Workshop to purchase items to use in battle.
+	- Go to the Stable to check and upgrade your inventory.
 - At the Watchtower, use the arrow keys to move left and right. Running into an enemy will initiate a battle.
 	- On your turn, use either the Slash or Stab attack by clicking one of the buttons on the left.
+	- If you have healing potions, you can use them with the small and large heart buttons.
 	- After attacking, click the Enemy Turn button to see what the enemy does.
 	- If you kill the enemy, you get some money. If you die, you return to the main screen and lose half of your money.
 ## Features
@@ -34,5 +35,7 @@ If these instructions seem complicated for someone who just wants to play a game
 	- Armory: upgrade strength and defense
 	- Pig pen: upgrade health and dexterity
 	- Grain silo: spend money to heal
+	- Workshop: Buy potions to heal in battle
+	- Stable: View and upgrade your inventory
 - Persistent storage between screens - sounds lame but was actually pretty hard to get working in a multi-page browser-based game without needing a database
 	- This is why our game needs a server instead of being able to just open an HTML file - local storage in the browser doesn't work when not accessing an actual website
