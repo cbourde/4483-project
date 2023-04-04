@@ -1,5 +1,6 @@
 # CS4483 Game Demo
 Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.
+Cameron Bourdeau [251080553]
 ## Running the game
 This is a web-based game, so there's no single executable file to run. The game should should be available to play at http://0042069.xyz.  
 - If the site doesn't load, make sure you're using **HTTP and not HTTPS!** I didn't want to go through the hassle of setting up a certificate for a site that would be used for like a week lol
