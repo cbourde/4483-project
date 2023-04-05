@@ -574,7 +574,7 @@ window.addEventListener('load', function(){
         document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;    
-        player.drawSwing(ctx);
+        //player.drawSwing(ctx);
         pAttack = player.attack();
         enemyParty.hit(pAttack);
         console.log("player attack took place");
@@ -635,6 +635,7 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
+	    player.drawSwing(ctx);
         }
         updateStatDisplays();
     })
@@ -650,7 +651,7 @@ window.addEventListener('load', function(){
         document.getElementById("pig_stab").style.display = 'none';
 		var pAttack = 0;
 		var eAttack = 0;   
-        player.drawStab(ctx);
+        //player.drawStab(ctx);
         pAttack = player.stab_attack();
         enemyParty.hit(pAttack);
         console.log("player attack took place");
@@ -711,6 +712,7 @@ window.addEventListener('load', function(){
             timeout = setTimeout(endGame2, 5000);
         } else {
             enTurn.draw(ctx);
+	    player.drawStab(ctx);
         }
         updateStatDisplays();
     });
@@ -900,7 +902,7 @@ window.addEventListener('load', function(){
             roundLabel.innerHTML = `Enemy performed an attack, <br>but the Pig dodged it!`;
             //display dodge img
             player.drawDodge(ctx);
-            dodgeChecker = false;
+            
         } else {
             roundLabel.innerHTML = `Enemy performed an attack, <br>hitting the Pig for ${eAttack}`;
         }
