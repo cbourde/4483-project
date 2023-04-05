@@ -3,7 +3,7 @@ Farmed and Dangerous: You're a pig, your goal is to kill stuff and get stronger.
 GitHub: https://github.com/cbourde/4483-project  
 
 ## Developers
-Cameron Bourdeau [251080553]
+Cameron Bourdeau [251080553]  
 Christopher Judkins [251094902]
 
 ## Running the game
