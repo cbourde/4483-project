@@ -902,7 +902,7 @@ window.addEventListener('load', function(){
             roundLabel.innerHTML = `Enemy performed an attack, <br>but the Pig dodged it!`;
             //display dodge img
             player.drawDodge(ctx);
-            dodgeChecker = false;
+            
         } else {
             roundLabel.innerHTML = `Enemy performed an attack, <br>hitting the Pig for ${eAttack}`;
         }
