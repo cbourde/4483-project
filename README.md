@@ -4,7 +4,7 @@ GitHub: https://github.com/cbourde/4483-project
 
 ## Developers
 Cameron Bourdeau [251080553]
-
+Christopher Judkins [251094902]
 
 ## Running the game
 This is a web-based game, so there's no single executable file to run. The game should should be available to play at:  https://cbourde.github.io/4483-project
