@@ -49,3 +49,6 @@ If these instructions seem complicated for someone who just wants to play a game
 	- Stable: View and upgrade your inventory
 - Persistent storage between screens - sounds lame but was actually pretty hard to get working in a multi-page browser-based game without needing a database
 	- This is why our game needs a server instead of being able to just open an HTML file - local storage in the browser doesn't work when not accessing an actual website
+
+## Misc
+- All art was generated using Midjourney AI, modified in photoshop.
